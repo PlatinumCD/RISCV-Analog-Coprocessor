@@ -1,8 +1,8 @@
-# LLVM-RISC-V Toolchain Dockerfile README
+# LLVM-RISC-V Toolchain Dockerfile 
 
 ## Introduction
 
-This repository uses a Dockerfile and Makefile to build an image encapsulating the LLVM and RISC-V toolchain environment. The Makefile hosts commands for initiating the build of Docker containers and images, cleaning them, and deploying them.
+This directory uses a Dockerfile and Makefile to build an image encapsulating the LLVM and RISC-V toolchain environment. The Makefile hosts commands for initiating the build of Docker containers and images, cleaning them, and deploying them.
 
 ## Prerequisites
 
@@ -16,8 +16,8 @@ This repository uses a Dockerfile and Makefile to build an image encapsulating t
 The Dockerfile provides instructions for creating a Docker image that consists of the LLVM and the RISC-V toolchain:
 
 - The base image being used is Ubuntu version 22.04.
-- The Dockerfile constructs two directories: `/src` and `/opt`.
-- Dependencies crucial to building the riscv-gnu-toolchain and LLVM (including git, cmake, python3, and others) are installed.
+- The Dockerfile constructs two directories: `/src` and `/opt`. These directories can be changed by modifying the Dockerfile arguments.
+- Dependencies to building the riscv-gnu-toolchain and LLVM (including git, cmake, python3, and others) are installed.
 - The Dockerfile clones the riscv-gnu-toolchain project into the `/src/riscv` directory and then compiles it.
 - Likewise, the llvm-project is cloned into the `/src/llvm-project` directory and built.
 - Lastly, the LLVM binaries are added to the PATH.
