@@ -7,11 +7,11 @@ IMAGE_ID := $(shell docker images -q llvm-riscv-toolchain)
 .PHONY: all clean
 
 all: 
-	@echo "Building LLVM RISC-V Toolchain..."
+	@echo "Building LLVM RISC-V Toolchain Image..."
 	docker build -t llvm-riscv-toolchain .
 
 clean:
-	@echo "Cleaning Docker Container and Image..."
+	@echo "Cleaning LLVM RISC-V Toolchain Container and Image..."
 	# Check if docker container is running, if yes then stop and remove it
 	ifneq ($(CONTAINER_ID),)
 		docker stop $(CONTAINER_ID)
@@ -21,3 +21,7 @@ clean:
 	ifneq ($(IMAGE_ID),)
 		docker rmi $(IMAGE_ID)
 	endif
+
+run:
+	@echo "Running LLVM RISC-V Toolchain Container..."
+	@docker run -it llvm-riscv-toolchain

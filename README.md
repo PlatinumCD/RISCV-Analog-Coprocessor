@@ -18,7 +18,7 @@ This project is a simulation of a RISC-V analog co-processor. It leverages a var
 ### Building the analog LLVM RISC-V Toolchain
 ---
 
-To build the analog LLVM RISC-V Toolchain, the RISC-V GNU Toolchain must be built prior to building LLVM. The following code blocks show the commands for building the compiler. I will be using the variables `$RACS_SRC` to represent the source directory, `$RACS_BUILD` to represent the build directory, and `$NUM_THREADS` to represent the number of threads for `make` to use.
+To build the analog LLVM RISC-V Toolchain, the RISC-V GNU Toolchain must be built prior to building LLVM. The following code blocks show the commands for building the compiler. I will be using the variables `$RACS_SRC` to represent the source directory, `$RACS_BUILD` to represent the build directory, and `$NUM_THREADS` to represent the number of threads for `make` to use. A Dockerfile to build the toolchain is included in the `dockerfiles` directory. 
 
 __RISC-V GNU Toolchain:__
 ```
@@ -47,5 +47,4 @@ The installation may take some time. After the installation of the the LLVM RISC
 ```
 export PATH="${PATH}:${RACS_BUILD}/llvm/bin"
 ```
-
 
