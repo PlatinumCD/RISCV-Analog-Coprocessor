@@ -13,7 +13,6 @@ This project contains the source code to simulate a RISC-V analog co-processor. 
 - [CrossSim](https://github.com/sandialabs/cross-sim): CrossSim simulates the analog computation. 
 
 ## Install
----
 
 This project can be broken down into two critical components:
 
