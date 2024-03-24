@@ -1,7 +1,4 @@
-##################################################
-# First stage, build all the required components #
-##################################################
-FROM ubuntu:22.04 as builder
+FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Initialize Arguments
@@ -47,17 +44,3 @@ WORKDIR /
 
 # Add LLVM binaries to $PATH
 ENV PATH="${PATH}:${RACS_BUILD}/llvm/bin"
-
-
-#################################################
-# Second stage, only copy what we actually need #
-#################################################
-FROM ubuntu:22.04
-
-ENV RACS_BUILD=/opt
-
-# Add RISC-V binaries and LLVM binaries to $PATH
-ENV PATH="${PATH}:${RACS_BUILD}/riscv/bin:${RACS_BUILD}/llvm/bin"
-
-# Copy /opt
-COPY --from=builder $RACS_BUILD/ $RACS_BUILD/

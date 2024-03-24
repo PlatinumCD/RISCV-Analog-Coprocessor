@@ -1,17 +1,17 @@
 # Get the ID of the running docker container
-CONTAINER_ID := $(shell docker ps -aqf "name=llvm-riscv-toolchain")
+CONTAINER_ID := $(shell docker ps -aqf "name=llvm-riscv-toolchain-dev")
 
 # Get the ID of the docker Image
-IMAGE_ID := $(shell docker images -q llvm-riscv-toolchain)
+IMAGE_ID := $(shell docker images -q llvm-riscv-toolchain-dev)
 
 .PHONY: all clean
 
 all: 
-	@echo "Building LLVM RISC-V Toolchain Image..."
-	docker build -t llvm-riscv-toolchain .
+	@echo "Building LLVM RISC-V Toolchain Dev Image..."
+	docker build -t llvm-riscv-toolchain-dev .
 
 clean:
-	@echo "Cleaning LLVM RISC-V Toolchain Container and Image..."
+	@echo "Cleaning LLVM RISC-V Toolchain Dev Container and Image..."
 	# Check if Docker container is running, if yes then stop and remove it
 	if [ "$(CONTAINER_ID)" ]; then \
 		docker stop $(CONTAINER_ID); \
@@ -23,11 +23,11 @@ clean:
 	fi
 
 run:
-	@echo "Running LLVM RISC-V Toolchain Container..."
-	docker run -it -v $(shell pwd):/local llvm-riscv-toolchain
+	@echo "Running LLVM RISC-V Toolchain Dev Container..."
+	docker run -it -v $(shell pwd):/local llvm-riscv-toolchain-dev
 
 test:
-	@echo "Running LLVM RISC-V Toolchain Tests..."
+	@echo "Running LLVM RISC-V Toolchain Dev Tests..."
 	./c_compiler tests/hello_world.c
 	./c_compiler tests/mvm_intrinsics.c
 	./cpp_compiler tests/hello_world.cpp
@@ -35,5 +35,5 @@ test:
 
 
 test-clean:
-	@echo "Cleaning LLVM RISC-V Toolchain Test Directory..."
+	@echo "Cleaning LLVM RISC-V Toolchain Dev Test Directory..."
 	rm ./tests/*.out

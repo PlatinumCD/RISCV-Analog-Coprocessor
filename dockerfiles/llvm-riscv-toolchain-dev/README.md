@@ -1,6 +1,6 @@
 # LLVM-RISC-V Toolchain Dockerfile 
 
-__The only difference between the `llvm-riscv-toolchain` Dockerfile and the `llvm-riscv-toolchain-dev` Dockerfile is that the source directory for LLVM and RISC-V are removed in the `llvm-riscv-toolchain` Dockerfile.__
+__The only difference between the `llvm-riscv-toolchain` Dockerfile and the `llvm-riscv-toolchain-dev` Dockerfile is that the source directory for LLVM and RISC-V are removed the `llvm-riscv-toolchain` Dockerfile.__
 
 This makes a huge difference in terms of Docker image size.
 ```
