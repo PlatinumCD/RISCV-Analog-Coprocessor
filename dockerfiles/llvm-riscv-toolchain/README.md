@@ -54,14 +54,14 @@ The Dockerfile makes use of environment variables to further customization. Any 
 
 2. `ENV RACS_BUILD=/opt` - Determines the directory where the build files will reside. In case you want the files to reside in a different directory, replace `/opt` with your preferred directory. 
 
-3. `ENV NUM_THREADS=64` - Defines the number of CPU cores to participate in building. Prior to initiation, ensure your machine has sufficient resources. You can modify `NUM_THREADS` as per the number cores available on your machine by replacing `64`.
+3. `ENV NUM_THREADS=32` - Defines the number of CPU cores to participate in building. Prior to initiation, ensure your machine has sufficient resources. You can modify `NUM_THREADS` as per the number cores available on your machine by replacing `32`.
 
 ## Using `c_compiler` and `cpp_compiler`
 
 __After__ the Dockerfile is built, the scripts `c_compiler` and `cpp_compiler` will work as intended. You can use these scripts like a native compiler. Here is an example of the LLVM RISC-V compiler being used to compile a program from __outside__ the container:
 
 ```
-./c_compiler tests/hello_world.c
+$ ./c_compiler tests/hello_world.c
 ```
 
 This command will create the file `tests/hello_world_c.out`.

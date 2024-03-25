@@ -21,7 +21,7 @@ This project can be broken down into two critical components:
 
 I've provided the instructions to build these components. I've also provided Dockerfiles to build the components individually and together. The instructions are listed below:
 
-### Building the Analog LLVM RISC-V Toolchain
+### Building the Analog LLVM RISC-V Toolchain:
 ---
 
 To build the Analog LLVM RISC-V Toolchain, the RISC-V GNU Toolchain must be built prior to building LLVM. The following code blocks show the commands for building the RISC-V GNU Toolchain as well as the Analog LLVM RISC-V Toolchain. I will be using the variables `$RACS_SRC` to represent the source directory, `$RACS_BUILD` to represent the build directory, and `$NUM_THREADS` to represent the number of threads for `make` to use. A Dockerfile to build the toolchain is included in the `dockerfiles` directory. 
