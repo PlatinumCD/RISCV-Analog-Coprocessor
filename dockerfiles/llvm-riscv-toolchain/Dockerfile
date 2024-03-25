@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Initialize Arguments
 ENV RACS_SRC=/src
 ENV RACS_BUILD=/opt
-ENV NUM_THREADS=32
+ENV NUM_THREADS=16
 
 # Create Source and Build directories
 RUN mkdir -p $RACS_SRC
@@ -23,6 +23,7 @@ RUN apt-get install -y autoconf automake autotools-dev curl lld \
 
 # RISC-V
 RUN git clone https://github.com/riscv/riscv-gnu-toolchain $RACS_SRC/riscv
+ADD ./misc/riscv_gitmodules $RACS_SRC/riscv/.gitmodules
 WORKDIR $RACS_SRC/riscv
 RUN ./configure --prefix=$RACS_BUILD/riscv --enable-multilib
 RUN make -j ${NUM_THREADS}

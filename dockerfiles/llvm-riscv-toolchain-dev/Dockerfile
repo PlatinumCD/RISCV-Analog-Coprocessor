@@ -20,6 +20,7 @@ RUN apt-get install -y autoconf automake autotools-dev curl lld \
 
 # RISC-V
 RUN git clone https://github.com/riscv/riscv-gnu-toolchain $RACS_SRC/riscv
+ADD ./misc/riscv_gitmodules $RACS_SRC/riscv/.gitmodules
 WORKDIR $RACS_SRC/riscv
 RUN ./configure --prefix=$RACS_BUILD/riscv --enable-multilib
 RUN make -j ${NUM_THREADS}
