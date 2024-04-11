@@ -26,7 +26,7 @@ I've provided the instructions to build these components. I've also provided Doc
 
 To build the Analog LLVM RISC-V Toolchain, the RISC-V GNU Toolchain must be built prior to building LLVM. The following code blocks show the commands for building the RISC-V GNU Toolchain as well as the Analog LLVM RISC-V Toolchain. I will be using the variables `$RACS_SRC` to represent the source directory, `$RACS_BUILD` to represent the build directory, and `$NUM_THREADS` to represent the number of threads for `make` to use. A Dockerfile to build the toolchain is included in the `dockerfiles` directory. 
 
-__Source/Build/Threads Configuration__
+__Source/Build/Threads Configuration:__
 ```
 export RACS_SRC=/src
 export RACS_BUILD=/opt
@@ -39,6 +39,7 @@ git clone https://github.com/riscv/riscv-gnu-toolchain $RACS_SRC/riscv
 cd $RACS_SRC/riscv
 ./configure --prefix=$RACS_BUILD/riscv --enable-multilib
 make -j ${NUM_THREADS}
+export PATH="${PATH}:${RACS_BUILD}/riscv/bin"
 ```
 
 __LLVM RISC-V Toolchain:__
@@ -70,3 +71,27 @@ Thread model: posix
 InstalledDir: /opt/llvm/bin
 ```
 
+### Building CrossSim-integrated SST
+
+To build the CrossSim-integrated SST, we need to install the SST Core, custom SST Elements, and CrossSim. I will reuse the `$RACS_SRC`, `$RACS_BUILD`, `$NUM_THREADS` variables again.
+
+__Building SST Core:__
+```
+git clone https://github.com/sstsimulator/sst-core.git ${RACS_SRC}/sst-core
+pip install blessings pygments
+cd ${RACS_SRC}/sst-core && ./autogen.sh
+mkdir ${RACS_SRC}/build && cd ${RACS_SRC}/build
+../configure \
+    MPICC=/bin/mpicc \
+    MPICXX=/bin/mpic++ \
+    --prefix=${RACS_BUILD}/sst-core
+make -j ${NUM_THREADS} install
+cd /
+export PATH="${PATH}:${RACS_BUILD}/sst-core/bin"
+```
+
+__Building custom SST Elements:__
+```
+git clone https://github.com/PlatinumCD/sst-elements.git ${RACS_SRC}/sst-elements
+
+```
