@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Initialize Arguments
+# Init env
 ENV RACS_SRC=/src
 ENV RACS_BUILD=/opt
 ENV NUM_THREADS=32
@@ -36,10 +36,9 @@ WORKDIR $RACS_SRC/llvm-project/build
 RUN cmake -S ../llvm -G Ninja -DCMAKE_INSTALL_PREFIX="${RACS_BUILD}/llvm" \
         -DCMAKE_BUILD_TYPE=Release  -DLLVM_ENABLE_PROJECTS=clang          \
         -DBUILD_SHARED_LIBS=True -DLLVM_OPTIMIZED_TABLEGEN=ON             \
-        -DLLVM_BUILD_TESTS=False                                          \
+        -DLLVM_BUILD_TESTS=False -DLLVM_TARGETS_TO_BUILD="RISCV"          \
         -DDEFAULT_SYSROOT="${RACS_BUILD}/riscv/riscv64-unknown-elf"       \
-        -DLLVM_DEFAULT_TARGET_TRIPLE="riscv64-unknown-elf"                \
-        -DLLVM_TARGETS_TO_BUILD="RISCV" 
+        -DLLVM_DEFAULT_TARGET_TRIPLE="riscv64-unknown-elf"                
 RUN cmake --build . --target install -- -j ${NUM_THREADS}
 WORKDIR /
 

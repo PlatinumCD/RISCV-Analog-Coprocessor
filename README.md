@@ -48,12 +48,11 @@ git clone -b llvm-riscv https://github.com/PlatinumCD/llvm-project.git $RACS_SRC
 mkdir $RACS_SRC/llvm-project/build
 cd $RACS_SRC/llvm-project/build
 cmake -S ../llvm -G Ninja -DCMAKE_INSTALL_PREFIX="${RACS_BUILD}/llvm" \
-        -DCMAKE_BUILD_TYPE=Debug  -DLLVM_ENABLE_PROJECTS=clang \
-        -DBUILD_SHARED_LIBS=True -DLLVM_OPTIMIZED_TABLEGEN=ON \
-        -DLLVM_BUILD_TESTS=False \
-        -DDEFAULT_SYSROOT="${RACS_BUILD}/riscv/riscv64-unknown-elf" \
-        -DLLVM_DEFAULT_TARGET_TRIPLE="riscv64-unknown-elf" \
-        -DLLVM_TARGETS_TO_BUILD="RISCV"
+    -DCMAKE_BUILD_TYPE=Debug -DLLVM_ENABLE_PROJECTS=clang         \
+    -DBUILD_SHARED_LIBS=True -DLLVM_OPTIMIZED_TABLEGEN=ON         \
+    -DLLVM_BUILD_TESTS=False -DLLVM_TARGETS_TO_BUILD="RISCV"      \
+    -DDEFAULT_SYSROOT="${RACS_BUILD}/riscv/riscv64-unknown-elf"   \
+    -DLLVM_DEFAULT_TARGET_TRIPLE="riscv64-unknown-elf"            \
 cmake --build . --target install -- -j ${NUM_THREADS}
 ```
 
@@ -73,7 +72,7 @@ InstalledDir: /opt/llvm/bin
 
 ### Building CrossSim-integrated SST
 
-To build the CrossSim-integrated SST, we need to install the SST Core, custom SST Elements, and CrossSim. I will reuse the `$RACS_SRC`, `$RACS_BUILD`, `$NUM_THREADS` variables again.
+To build the CrossSim-integrated SST, we need to install the SST Core, custom SST Elements, and CrossSim. I will reuse the `$RACS_SRC`, `$RACS_BUILD`, `$NUM_THREADS` variables.
 
 __Building SST Core:__
 ```
@@ -81,17 +80,23 @@ git clone https://github.com/sstsimulator/sst-core.git ${RACS_SRC}/sst-core
 pip install blessings pygments
 cd ${RACS_SRC}/sst-core && ./autogen.sh
 mkdir ${RACS_SRC}/build && cd ${RACS_SRC}/build
-../configure \
-    MPICC=/bin/mpicc \
+../configure           \
+    MPICC=/bin/mpicc   \
     MPICXX=/bin/mpic++ \
     --prefix=${RACS_BUILD}/sst-core
 make -j ${NUM_THREADS} install
-cd /
 export PATH="${PATH}:${RACS_BUILD}/sst-core/bin"
 ```
 
 __Building custom SST Elements:__
 ```
 git clone https://github.com/PlatinumCD/sst-elements.git ${RACS_SRC}/sst-elements
-
+cd ${RACS_SRC}/sst-elements && ./autogen.sh
+mkdir ${RACS_SRC}/sst-elements/build && cd ${RACS_SRC}/sst-elements/build
+../configure                                                              \
+    MPICC=/bin/mpicc                                                      \
+    MPICXX=/bin/mpic++                                                    \
+    CPPFLAGS=-I/usr/local/lib/python3.10/dist-packages/numpy/core/include \
+    --prefix=${RACS_BUILD}/sst-elements
+make -j ${NUM_THREADS} install
 ```
