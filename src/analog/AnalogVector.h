@@ -22,71 +22,81 @@ class AnalogVector : AnalogDataType<T> {
 public:
 
     /**
-     * @brief Constructor of the AnalogVector class 
+     * @brief Constructor of the AnalogVector class without an array
      */
-    AnalogVector(float* arr, uint32_t length) :
-        arr_length(TILE_COLS), 
-        in_length(length), 
-        in_arr(arr),
-        tile_arr(nullptr)
+    AnalogVector(uint32_t length) :
+        host_arr(nullptr),
+        host_length(length), 
+        device_arr(nullptr),
+        device_length(DEVICE_COLS)
     {}
 
     /**
-     * @brief Allocates memory for the tile array and then quantizes the input array to the range of type T by normalizing all values to the maximum absolute value.
+     * @brief Constructor of the AnalogVector class using an array 
+     */
+    AnalogVector(float* arr, uint32_t length) :
+        host_arr(arr),
+        host_length(length), 
+        device_arr(nullptr),
+        device_length(DEVICE_COLS)
+    {}
+
+    /**
+     * @brief Allocates memory for the device array and then quantizes the input array to the range of type T by normalizing all values to the maximum absolute value.
      */
     void quantize() {
-        // Allocate space for the tile array
-        tile_arr = new T[arr_length]();
+        // Allocate space for the device array
+        device_arr = new T[device_length]();
 
         // Identify scale factor
         float scale_factor = 0.0f;
-        for (uint32_t i = 0; i < in_length; i++) {
-            if (fabs(in_arr[i]) > scale_factor) {
-                scale_factor = fabs(in_arr[i]);
+        for (uint32_t i = 0; i < host_length; i++) {
+            if (fabs(host_arr[i]) > scale_factor) {
+                scale_factor = fabs(host_arr[i]);
             }
         }
         this->set_scale_factor(scale_factor);
 
         // Scale vector values to fit type T limits
         T max_type_limit = this->get_max_type_limit();
-        for (uint32_t i = 0; i < in_length; i++) {
-            tile_arr[i] = std::round(in_arr[i] / scale_factor * max_type_limit);
+        for (uint32_t i = 0; i < host_length; i++) {
+            device_arr[i] = std::round(host_arr[i] / scale_factor * max_type_limit);
         }
     }
 
     /**
-     * @brief Returns the quantized tile matrix
+     * @brief Returns the quantized device array.
      */
-    T** get_tile_arr() {
-        return tile_arr;
+    T** get_device_arr() {
+        return device_arr;
     }
 
     /**
-     * @brief Prints the properties and content of the tile array if it has been quantized. 
+     * @brief Prints the properties and content of the device array if it has been quantized. 
      */
     void print() {
 
-        if (tile_arr == nullptr) {
+        if (device_arr == nullptr) {
             std::cout << "Vector not quantized." << std::endl;
             return;
         }
 
-        std::cout << "Array Length: " << arr_length << std::endl;
-        std::cout << "Input Size: " << in_length << std::endl;
-        std::cout << "Tile Array:" << std::endl;
+        std::cout << "Device Array Length: " << device_length << std::endl;
+        std::cout << "Host Array Length: " << host_length << std::endl;
+        std::cout << "Device Array:" << std::endl;
         std::cout << "\t";
-        for (uint32_t i = 0; i < in_length+2; i++) {
-            std::cout << std::setw(4) << static_cast<int>(tile_arr[i]) << " ";
+        for (uint32_t i = 0; i < host_length+2; i++) {
+            std::cout << std::setw(4) << static_cast<int>(device_arr[i]) << " ";
         }
         std::cout << "..." << std::endl;
         std::cout << std::endl;
     }
 
 private:
-    uint32_t arr_length;
-    uint32_t in_length;
-    float* in_arr;
-    T* tile_arr;
+    float* host_arr;
+    uint32_t host_length;
+    T* device_arr;
+    uint32_t device_length;
 };
 
 #endif
