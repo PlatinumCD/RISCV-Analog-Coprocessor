@@ -1,14 +1,14 @@
 # Get the ID of the running docker container
-CONTAINER_ID := $(shell docker ps -aqf "name=sst-crosssim")
+CONTAINER_ID := $(shell docker ps -aqf "name=sst-crosssim-dev")
 
 # Get the ID of the docker Image
-IMAGE_ID := $(shell docker images -q sst-crosssim)
+IMAGE_ID := $(shell docker images -q sst-crosssim-dev)
 
 .PHONY: all clean
 
 all: 
-	@echo "Building SST-CrossSim Image..."
-	docker build -t sst-crosssim .
+	@echo "Building SST-CrossSim-dev Image..."
+	docker build -t sst-crosssim-dev .
 
 clean:
 	@echo "Cleaning SST-CrossSim Container and Image..."
@@ -24,4 +24,4 @@ clean:
 
 run:
 	@echo "Running SST-CrossSim Container..."
-	docker run -it -v $(shell pwd):/local sst-crosssim
+	docker run -it -v $(shell pwd):/local sst-crosssim-dev

@@ -55,7 +55,7 @@ RUN apt-get update
 RUN apt-get install -y python3.10 libpython3.10-dev openmpi-bin openmpi-common libopenmpi-dev
 
 # Add SST Core binaries and SST Elements binaries to $PATH
-ENV PATH="${PATH}:${RACS_BUILD}/sst-core/bin
+ENV PATH="${PATH}:${RACS_BUILD}/sst-core/bin"
 
 # Copy /opt
 COPY --from=builder $RACS_BUILD/ $RACS_BUILD/

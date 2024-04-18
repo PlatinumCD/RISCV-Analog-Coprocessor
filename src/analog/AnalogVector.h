@@ -67,7 +67,7 @@ public:
     /**
      * @brief Returns the quantized device array.
      */
-    T** get_device_arr() {
+    T* get_device_arr() {
         return device_arr;
     }
 
