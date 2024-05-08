@@ -1,27 +1,53 @@
-# Get the ID of the running docker container
-CONTAINER_ID := $(shell docker ps -aqf "name=sst-crosssim-dev")
+# Release Args
+RELEASE?=1.0.0
+PLATFORM?=linux/amd64,linux/arm64
+DOCKERHUB_USER?=platinumcd
+IMAGE_NAME?=analog-sst-crosssim-dev
 
-# Get the ID of the docker Image
-IMAGE_ID := $(shell docker images -q sst-crosssim-dev)
+# Build Args
+BUILD_SRC?=/src
+BUILD_DEST?=/opt
+NUM_THREADS?=32
 
-.PHONY: all clean
+# CrossSim Args
+CROSSSIM_GIT?=https://github.com/sandialabs/cross-sim.git
+CROSSSIM_BRANCH?=v3.0
 
-all: 
-	@echo "Building SST-CrossSim-dev Image..."
-	docker build -t sst-crosssim-dev .
+# SST Core Args
+SSTCORE_GIT?=https://github.com/sstsimulator/sst-core.git
+SSTCORE_BRANCH?=master
 
-clean:
-	@echo "Cleaning SST-CrossSim Container and Image..."
-	# Check if Docker container is running, if yes then stop and remove it
-	if [ "$(CONTAINER_ID)" ]; then \
-		docker stop $(CONTAINER_ID); \
-		docker rm $(CONTAINER_ID); \
-	fi
-	# Check if Docker image exists, If yes then remove it
-	if [ "$(IMAGE_ID)" ]; then \
-		docker rmi $(IMAGE_ID); \
-	fi
+# SST Elements Args
+SSTELEMENTS_GIT?=https://github.com/PlatinumCD/sst-elements.git
+SSTELEMENTS_BRANCH?=basic_rocc
 
-run:
-	@echo "Running SST-CrossSim Container..."
-	docker run -it -v $(shell pwd):/local sst-crosssim-dev
+all: image
+
+image:
+	docker build \
+		--build-arg BUILD_SRC=$(BUILD_SRC) \
+		--build-arg BUILD_DEST=$(BUILD_DEST) \
+		--build-arg NUM_THREADS=$(NUM_THREADS) \
+		--build-arg CROSSSIM_GIT=$(CROSSSIM_GIT) \
+		--build-arg CROSSSIM_BRANCH=$(CROSSSIM_BRANCH) \
+		--build-arg SSTCORE_GIT=$(SSTCORE_GIT) \
+		--build-arg SSTCORE_BRANCH=$(SSTCORE_BRANCH) \
+		--build-arg SSTELEMENTS_GIT=$(SSTELEMENTS_GIT) \
+		--build-arg SSTELEMENTS_BRANCH=$(SSTELEMENTS_BRANCH) \
+		-t "$(DOCKERHUB_USER)/$(IMAGE_NAME):$(RELEASE)" \
+		.
+
+push:
+	docker build \
+		--build-arg BUILD_SRC=$(BUILD_SRC) \
+		--build-arg BUILD_DEST=$(BUILD_DEST) \
+		--build-arg NUM_THREADS=$(NUM_THREADS) \
+		--build-arg CROSSSIM_GIT=$(CROSSSIM_GIT) \
+		--build-arg CROSSSIM_BRANCH=$(CROSSSIM_BRANCH) \
+		--build-arg SSTCORE_GIT=$(SSTCORE_GIT) \
+		--build-arg SSTCORE_BRANCH=$(SSTCORE_BRANCH) \
+		--build-arg SSTELEMENTS_GIT=$(SSTELEMENTS_GIT) \
+		--build-arg SSTELEMENTS_BRANCH=$(SSTELEMENTS_BRANCH) \
+		-t "$(DOCKERHUB_USER)/$(IMAGE_NAME):$(RELEASE)" \
+		--platform "$(PLATFORM)" --push \
+		.
