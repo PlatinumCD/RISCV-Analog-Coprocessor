@@ -13,5 +13,4 @@ ARG BUILD_DEST
 COPY --from=compiler_stage ${BUILD_SRC} ${BUILD_SRC}
 COPY --from=compiler_stage ${BUILD_DEST} ${BUILD_DEST}
 
-ENV PATH="${PATH}:${BUILD_DEST}/sst-core/bin"
 ENV PATH="${PATH}:${BUILD_DEST}/llvm/bin"
