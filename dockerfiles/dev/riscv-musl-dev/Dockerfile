@@ -16,15 +16,16 @@ RUN apt-get update -y && \
             python3 python3-pip libmpc-dev libmpfr-dev libgmp-dev \
             gawk build-essential bison flex texinfo gperf libtool \
             patchutils bc zlib1g-dev libexpat-dev ninja-build git \
-            cmake libglib2.0-dev libslirp-dev
+            cmake libglib2.0-dev libslirp-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 # RISC-V
-RUN git clone -b ${RISCV_BRANCH} ${RISCV_GIT} ${BUILD_SRC}/riscv
-ADD ./gitmodules ${BUILD_SRC}/riscv/.gitmodules
-WORKDIR ${BUILD_SRC}/riscv
-RUN ./configure --prefix=${BUILD_DEST}/riscv
-RUN make -j ${NUM_THREADS} musl
-WORKDIR /
+ADD ./gitmodules ${BUILD_SRC}/.gitmodules
+RUN git clone -b ${RISCV_BRANCH} ${RISCV_GIT} ${BUILD_SRC}/riscv && \
+    cd ${BUILD_SRC}/riscv && \
+    mv ${BUILD_SRC}/.gitmodules ${BUILD_SRC}/riscv/.gitmodules && \
+    ./configure --prefix=${BUILD_DEST}/riscv && \
+    make -j ${NUM_THREADS} musl
 
 # Add RISC-V binaries to $PATH
 ENV PATH="${PATH}:${BUILD_DEST}/riscv/bin"

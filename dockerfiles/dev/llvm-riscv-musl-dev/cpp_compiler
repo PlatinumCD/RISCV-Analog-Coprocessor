@@ -1,0 +1,21 @@
+#!/bin/bash
+
+DOCKERHUB_USER=platinumcd
+IMAGE=analog-llvm-riscv-musl-dev
+RELEASE=1.0.0
+
+MOUNT_DIR=/local
+BUILD_DEST=/opt
+CC=clang++
+GCC_TOOLCHAIN=$BUILD_DEST/riscv
+TARGET=riscv64-unknown-linux-musl
+ARCH=rv64g
+
+docker run --rm \
+    -v $(pwd):$MOUNT_DIR               \
+    $DOCKERHUB_USER/$IMAGE:$RELEASE    \
+    $CC                                \
+        --gcc-toolchain=$GCC_TOOLCHAIN \
+        --target=$TARGET               \
+        -march=$ARCH -static           \
+        $MOUNT_DIR/$1 -o $MOUNT_DIR/"${1%.cpp}_cpp.out"
