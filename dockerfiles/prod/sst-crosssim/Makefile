@@ -2,7 +2,7 @@
 RELEASE?=1.0.0
 PLATFORM?=linux/amd64,linux/arm64
 DOCKERHUB_USER?=platinumcd
-IMAGE_NAME?=analog-sst-crosssim
+SST_CROSSSIM_IMAGE_NAME?=analog-sst-crosssim
 
 # Build Args
 BUILD_SRC?=/src
@@ -34,7 +34,7 @@ image:
 		--build-arg SSTCORE_BRANCH=$(SSTCORE_BRANCH) \
 		--build-arg SSTELEMENTS_GIT=$(SSTELEMENTS_GIT) \
 		--build-arg SSTELEMENTS_BRANCH=$(SSTELEMENTS_BRANCH) \
-		-t "$(DOCKERHUB_USER)/$(IMAGE_NAME):$(RELEASE)" \
+		-t "$(DOCKERHUB_USER)/$(SST_CROSSSIM_IMAGE_NAME):$(RELEASE)" \
 		.
 
 push:
@@ -48,6 +48,6 @@ push:
 		--build-arg SSTCORE_BRANCH=$(SSTCORE_BRANCH) \
 		--build-arg SSTELEMENTS_GIT=$(SSTELEMENTS_GIT) \
 		--build-arg SSTELEMENTS_BRANCH=$(SSTELEMENTS_BRANCH) \
-		-t "$(DOCKERHUB_USER)/$(IMAGE_NAME):$(RELEASE)" \
+		-t "$(DOCKERHUB_USER)/$(SST_CROSSSIM_IMAGE_NAME):$(RELEASE)" \
 		--platform "$(PLATFORM)" --push \
 		.

@@ -2,7 +2,7 @@
 RELEASE?=1.0.0
 PLATFORM?=linux/amd64,linux/arm64
 DOCKERHUB_USER?=platinumcd
-IMAGE_NAME?=analog-riscv-musl
+RISCV_MUSL_IMAGE_NAME?=analog-riscv-musl
 
 # Build Args
 BUILD_SRC?=/src
@@ -21,7 +21,7 @@ image:
 		--build-arg NUM_THREADS=$(NUM_THREADS) \
 		--build-arg RISCV_GIT=$(RISCV_GIT) \
 		--build-arg RISCV_BRANCH=$(RISCV_BRANCH) \
-		-t "$(DOCKERHUB_USER)/$(IMAGE_NAME):$(RELEASE)" \
+		-t "$(DOCKERHUB_USER)/$(RISCV_MUSL_IMAGE_NAME):$(RELEASE)" \
 		.
 
 push:
@@ -31,6 +31,6 @@ push:
 		--build-arg NUM_THREADS=$(NUM_THREADS) \
 		--build-arg RISCV_GIT=$(RISCV_GIT) \
 		--build-arg RISCV_BRANCH=$(RISCV_BRANCH) \
-		-t "$(DOCKERHUB_USER)/$(IMAGE_NAME):$(RELEASE)" \
+		-t "$(DOCKERHUB_USER)/$(RISCV_MUSL_IMAGE_NAME):$(RELEASE)" \
 		--platform "$(PLATFORM)" --push \
 		.
