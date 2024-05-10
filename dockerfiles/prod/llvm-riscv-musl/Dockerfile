@@ -40,5 +40,6 @@ FROM ubuntu:22.04
 COPY --from=builder ${BUILD_DEST} ${BUILD_DEST}
 
 # Add LLVM binaries to $PATH
+ARG BUILD_DEST
 ENV PATH="${PATH}:${BUILD_DEST}/riscv/bin"
 ENV PATH="${PATH}:${BUILD_DEST}/llvm/bin"

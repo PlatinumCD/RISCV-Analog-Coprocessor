@@ -1,16 +1,28 @@
 #include <cstdint>
 
-#include "mmio.h"
 #include "analog/analog.h"
 
 int main() {
 
-    int rows, cols, length;
-    float** mat;
-    float* vec;
+    int rows = 3;
+    int cols = 3;
 
-    readMatrixData(mat, rows, cols);
-    readVectorData(vec, length);
+    float** mat = new float*[rows];
+    float* vec = new float[cols];
+
+    // Generate mat
+    for (int i = 0; i < rows; i++) {
+        mat[i] = new float[cols];
+        for (int j = 0; j < cols; j++) {
+            mat[i][j] = 4;//(float)rand()/(float)RAND_MAX*4 - 2; // Generates a random float between -2 and 2
+        }
+    }
+
+    // Generate vec
+    for (int i = 0; i < cols; i++) {
+        vec[i] = 3;//(float)rand()/(float)RAND_MAX*4 - 2; // Generates a random float between -2 and 2
+    }
+
 
     using mytype = int8_t;
     /*
@@ -22,7 +34,7 @@ int main() {
      */
 
     AnalogMatrix<mytype> analog_mat = AnalogMatrix<mytype>(mat, rows, cols);
-    AnalogVector<mytype> analog_vec = AnalogVector<mytype>(vec, length);
+    AnalogVector<mytype> analog_vec = AnalogVector<mytype>(vec, cols);
 
     /*
     analog_mat.quantize();
@@ -36,7 +48,7 @@ int main() {
     mvm_load_vector(analog_vec, 0);
     mvm_compute(0);
 
-    AnalogVector<mytype> analog_vec_out = AnalogVector<mytype>(length);
+    AnalogVector<mytype> analog_vec_out = AnalogVector<mytype>(cols);
     mvm_store_vector(analog_vec_out, 0);
 
     mvm_move_vector(0, 1);

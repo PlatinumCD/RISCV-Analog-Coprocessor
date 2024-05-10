@@ -1,0 +1,16 @@
+#!/bin/bash
+
+BUILD_DEST=/opt
+
+GCC_TOOLCHAIN=$BUILD_DEST/riscv
+TARGET=riscv64
+ARCH=rv64g
+
+DOCKERHUB_USER=platinumcd
+LLVM_RISCV_MUSL_IMAGE=analog-llvm-riscv-musl
+RELEASE=1.0.0
+
+docker run --rm \
+    -v $(pwd):/local \
+    $DOCKERHUB_USER/$LLVM_RISCV_MUSL_IMAGE:$RELEASE \
+    sh -c "llvm-objdump -D /local/$1 > /local/$1.dump"
