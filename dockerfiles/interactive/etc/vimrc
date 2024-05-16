@@ -1,0 +1,29 @@
+syntax enable
+
+set nocompatible
+filetype plugin on
+
+set textwidth=80
+
+filetype indent on
+set smartindent
+
+set tabstop=4 shiftwidth=4 expandtab
+set cursorline
+
+autocmd BufRead,BufNewFile *.html set filetype=html
+autocmd BufRead,BufNewFile *.py,*.c,*.cpp,*.h set foldmethod=indent
+autocmd BufRead,BufNewFile *.py,*.c,*.cpp,*.h set foldcolumn=2
+autocmd BufRead,BufNewFile *.py,*.c,*.cpp,*.h set number
+
+set foldlevelstart=99
+
+
+autocmd BufRead,BufNewFile *.txt,*.md set foldcolumn=2
+
+hi FoldColumn term=standout ctermbg=NONE guibg=NONE 
+
+set linebreak
+set wrap
+set nolist
+

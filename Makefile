@@ -13,4 +13,4 @@ docs:
 	doxygen Doxyfile
 
 clean:
-	rm -rf *.o prog docs
+	rm -rf *.o *.out* docs sst_env/std*-100

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DOCKERHUB_USER=platinumcd
-IMAGE=analog-llvm-riscv-musl-dev
+IMAGE=analog-llvm-riscv-musl
 RELEASE=1.0.0
 
 MOUNT_DIR=/local

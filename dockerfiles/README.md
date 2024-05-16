@@ -1,17 +1,24 @@
-# Prod vs Dev
+# Infrastructure Dockerfiles
 
-The difference between `prod` and `dev` is that `prod` doesn't include the
-source code used to build the infrastructure. Also, `prod` takes up
-significantly less space.
+The `prod`, `dev`, and `interactive` directories contain scripts to build the containerized analog stack infrastructure using Docker. The analog stack infrastructure consists of two major components:
 
-REPOSITORY                              TAG       IMAGE ID       CREATED          SIZE
-platinumcd/analog-stack-dev             1.0.0     7ce6745ca002   2 minutes ago    24.6GB
-platinumcd/analog-llvm-riscv-musl-dev   1.0.0     05ec5af55b42   4 minutes ago    16.7GB
-platinumcd/analog-riscv-musl-dev        1.0.0     55971c56ea1d   31 minutes ago   12GB
-platinumcd/analog-sst-crosssim-dev      1.0.0     747330d96143   5 hours ago      8.47GB
+1. The Compiler toolchain
+2. The Simulation framework
 
-REPOSITORY                              TAG       IMAGE ID       CREATED          SIZE
-platinumcd/analog-stack                 1.0.0     8bbdb32c8517   2 hours ago      3.87GB
-platinumcd/analog-llvm-riscv-musl       1.0.0     cc3717f5832b   5 hours ago      2.21GB
-platinumcd/analog-riscv-musl            1.0.0     fe168b1a2ed3   6 hours ago      1.88GB
-platinumcd/analog-sst-crosssim          1.0.0     2693d5e9b53b   2 hours ago      2.28GB
+## The Compiler toolchain
+
+The compiler toolchain employs a custom LLVM RISC-V musl cross compiler. This custom compiler ensures compatibility with the simulation infrastructure, facilitating the compilation process tailored to the specific requirements of the analog stack.
+
+## The Simulation infrastructure
+
+The simulation framework leverages SST (Structural Simulation Toolkit) and integrates a custom SST element named Golem. Golem includes CrossSim to implement analog capabilities, enabling detailed modeling and simulation of analog behaviors in conjunction with digital simulations.
+
+# Prod vs Dev vs Interactive
+
+The primary difference between `prod`, `dev`, and `interactive` images lies in the amount of content included:
+
+- **prod**: This image does not contain the source code for the binaries that are built. It is optimized for deployment with a focus on being minimal, which results in much smaller image sizes.
+- **dev**: This image contains the source code for all the binaries that are built. It provides a comprehensive development environment with all necessary tools and dependencies for development and debugging.
+- **interactive**: This image utilizes the `prod` compiler toolchain but includes the `dev` simulation infrastructure. It is designed for interactive use, offering a balance between the lightweight nature of `prod` and the full capabilities of `dev`.
+
+Prod images are significantly smaller than dev images, reflecting their streamlined content without source code.

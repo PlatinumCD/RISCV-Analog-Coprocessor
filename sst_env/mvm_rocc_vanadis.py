@@ -1,7 +1,7 @@
 import os
 import sst
 mh_debug_level=10
-mh_debug=0
+mh_debug=10
 dbgAddr=0
 stopDbg=0
 
@@ -13,6 +13,12 @@ vanadis_isa = os.getenv("VANADIS_ISA", "RISCV64")
 isa="riscv64"
 
 loader_mode = os.getenv("VANADIS_LOADER_MODE", "0")
+
+NUM_ARRAYS = os.getenv("VANADIS_NUM_ARRAYS", "2")
+INPUT_ARR_SIZE = os.getenv("VANADIS_INPUT_ARR_SIZE", "3")
+OUTPUT_ARR_SIZE = os.getenv("VANADIS_OUTPUT_ARR_SIZE", "3")
+INPUT_OP_SIZE = os.getenv("VANADIS_INPUT_OP_SIZE", "4")
+OUTPUT_OP_SIZE = os.getenv("VANADIS_OUTPUT_OP_SIZE", "4")
 
 testDir="mvm"
 #exe = "hello-world"
@@ -125,7 +131,7 @@ protocol="MESI"
 # OS related params
 osParams = {
     "processDebugLevel" : 0,
-    "dbgLevel" : os_verbosity,
+    "dbgLevel" : 0,
     "dbgMask" : 0xFFFFFFFF,
     "cores" : numCpus,
     "hardwareThreadCount" : numThreads,
@@ -233,7 +239,7 @@ decoderParams = {
 }
 
 osHdlrParams = {
-    "verbose" : os_verbosity,
+    "verbose" : 0
 }
 
 branchPredParams = {
@@ -242,7 +248,7 @@ branchPredParams = {
 
 cpuParams = {
     "clock" : cpu_clock,
-    "verbose" : verbosity,
+    "verbose" : 0,
     "hardware_threads": numThreads,
     "physical_fp_registers" : 168 * numThreads,
     "physical_integer_registers" : 180 * numThreads,
@@ -289,11 +295,11 @@ arrayParams = {
 }
 
 roccarrayParams = {
-    "numArrays" : 2,
-    "arrayInputSize" : 3,
-    "arrayOutputSize" : 3,
-    "inputOperandSize" : 4,
-    "outputOperandSize" : 4
+    "numArrays" : NUM_ARRAYS,
+    "arrayInputSize" : INPUT_ARR_SIZE,
+    "arrayOutputSize" : OUTPUT_ARR_SIZE,
+    "inputOperandSize" : INPUT_OP_SIZE,
+    "outputOperandSize" : OUTPUT_OP_SIZE
 }
 
 roccParams.update(roccarrayParams)
@@ -393,8 +399,8 @@ class CPU_Builder:
         cpuDcacheIf = cpu_lsq.setSubComponent( "memory_interface", "memHierarchy.standardInterface" )
 
         # CPU.rocc compute array 
-        #computeArray = cpu_rocc.setSubComponent( "array", "golem.ManualMVMComputeArray" )
-        computeArray = cpu_rocc.setSubComponent( "array", "golem.CrossSimComputeArray" )
+        computeArray = cpu_rocc.setSubComponent( "array", "golem.ManualMVMComputeArray" )
+        #computeArray = cpu_rocc.setSubComponent( "array", "golem.CrossSimComputeArray" )
         computeArray.addParams(arrayParams)
 
         # CPU.rocc mem interface which connects to D-cache 

@@ -1,0 +1,55 @@
+Matrix data values and their addresses:
+Value: 95 at address: 0x1830
+Value: 127 at address: 0x1831
+Value: 95 at address: 0x1832
+Value: 95 at address: 0x1833
+Value: 0 at address: 0x1834
+Value: 0 at address: 0x1835
+Value: 127 at address: 0x1836
+Value: 95 at address: 0x1837
+Value: 127 at address: 0x1838
+Value: 95 at address: 0x1839
+Value: 0 at address: 0x183a
+Value: 0 at address: 0x183b
+Value: 95 at address: 0x183c
+Value: 127 at address: 0x183d
+Value: 95 at address: 0x183e
+Value: 95 at address: 0x183f
+Value: 0 at address: 0x1840
+Value: 0 at address: 0x1841
+Value: 0 at address: 0x1842
+Value: 0 at address: 0x1843
+Value: 0 at address: 0x1844
+Value: 0 at address: 0x1845
+Value: 0 at address: 0x1846
+Value: 0 at address: 0x1847
+Value: 0 at address: 0x1848
+Value: 0 at address: 0x1849
+Value: 0 at address: 0x184a
+Value: 0 at address: 0x184b
+Value: 0 at address: 0x184c
+Value: 0 at address: 0x184d
+Host Size: 3x4
+Host Matrix: 
+	   3    4    3    3 
+	   4    3    4    3 
+	   3    4    3    3 
+Max type limit: 127
+Device Size: 5x6
+Device Matrix:
+	  95  127   95   95    0    0 
+	 127   95  127   95    0    0 
+	  95  127   95   95    0    0 
+	   0    0    0    0    0    0 
+	   0    0    0    0    0    0 
+
+Host Array Length: 4
+	2 1 2 2 
+Device Array Length: 6
+Device Array:
+	 127   63  127  127    0    0 
+Host Array Length: 4
+	21.9213 24.9528 21.9213 0 
+Device Array Length: 6
+Device Array:
+	44196 50308 44196    0    0    0 
