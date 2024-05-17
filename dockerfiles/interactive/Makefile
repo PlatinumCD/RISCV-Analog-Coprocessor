@@ -20,7 +20,7 @@ run:
 		-v $(PWD):/local \
 		$(DOCKERHUB_USER)/$(ANALOG_INTERACTIVE_STACK_IMAGE_NAME):$(RELEASE)
 
-image:
+build:
 	docker build \
 		--build-arg DOCKERHUB_USER=$(DOCKERHUB_USER) \
 		--build-arg RELEASE=$(RELEASE) \
