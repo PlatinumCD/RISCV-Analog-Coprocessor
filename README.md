@@ -49,7 +49,7 @@ The interactive environment strikes a balance between the production and develop
 To build and run the interactive environment:
 ```sh
 cd dockerfiles/interactive
-make image
+make build
 make run
 ```
 
