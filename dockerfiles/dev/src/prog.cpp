@@ -6,27 +6,20 @@ int main() {
     const int rows = 3;
     const int cols = 4;
 
-    // Allocate memory for matrix and vector
+    // Initialize matrix
     float** mat = new float*[rows];
-    float* vec = new float[cols];
-
-    // Initialize matrix with default values and set specific elements
     for (int i = 0; i < rows; i++) {
         mat[i] = new float[cols];
         for (int j = 0; j < cols; j++) {
             mat[i][j] = 3.0f;
         }
     }
-    mat[0][1] = 4.0f;
-    mat[1][0] = 4.0f;
-    mat[1][2] = 4.0f;
-    mat[2][1] = 4.0f;
 
-    // Initialize vector with default values and set specific element
+    // Initialize vector
+    float* vec = new float[cols];
     for (int i = 0; i < cols; i++) {
         vec[i] = 2.0f;
     }
-    vec[1] = 1.0f;
 
     // Define input and output data types
     using input = int8_t;
@@ -42,18 +35,19 @@ int main() {
     AnalogVector<output> analog_vec_out(cols);
 
     // Set matrix in the analog context and load the vector
-    mvm_set_matrix(ctx, analog_mat, 0);
-    mvm_load_vector(ctx, analog_vec, 0);
+    const int array_id = 0;
+    mvm_set_matrix(ctx, analog_mat, array_id);
+    mvm_load_vector(ctx, analog_vec, array_id);
 
     // Print the matrix and vector
     analog_mat.print();
     analog_vec.print();
 
     // Perform matrix-vector multiplication
-    mvm_compute(ctx, 0);
+    mvm_compute(ctx, array_id);
 
     // Store the resulting vector
-    mvm_store_vector(ctx, analog_vec_out, 0);
+    mvm_store_vector(ctx, analog_vec_out, array_id);
 
     // Print the result
     analog_vec_out.print();

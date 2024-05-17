@@ -1,0 +1,12 @@
+#!/bin/bash
+
+CC="clang++ -fno-vectorize -fno-slp-vectorize -O0"
+GCC_TOOLCHAIN=$BUILD_DEST/riscv
+TARGET=riscv64-unknown-linux-musl
+ARCH=rv64g
+
+$CC                                \
+    --gcc-toolchain=$GCC_TOOLCHAIN \
+    --target=$TARGET               \
+    -march=$ARCH -static -v          \
+    $1 -o "${1%.cpp}_cpp.out"

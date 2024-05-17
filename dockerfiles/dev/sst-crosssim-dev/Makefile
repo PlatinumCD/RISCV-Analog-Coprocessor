@@ -15,11 +15,12 @@ CROSSSIM_BRANCH?=v3.0
 
 # SST Core Args
 SSTCORE_GIT?=https://github.com/sstsimulator/sst-core.git
-SSTCORE_BRANCH?=master
+SSTCORE_BRANCH?=v13.1.0_Final
 
 # SST Elements Args
 SSTELEMENTS_GIT?=https://github.com/PlatinumCD/sst-elements.git
-SSTELEMENTS_BRANCH?=basic_rocc
+#SSTELEMENTS_BRANCH?=basic_rocc
+SSTELEMENTS_BRANCH?=refactor
 
 all: image
 

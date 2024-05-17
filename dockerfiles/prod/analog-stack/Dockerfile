@@ -11,4 +11,15 @@ ARG BUILD_DEST
 
 COPY --from=compiler_stage ${BUILD_DEST} ${BUILD_DEST}
 
+ARG ANALOG_LIB_GIT
+ARG ANALOG_LIB_BRANCH
+
 ENV PATH="${PATH}:${BUILD_DEST}/llvm/bin"
+ENV BUILD_SRC=${BUILD_SRC}
+ENV BUILD_DEST=${BUILD_DEST}
+
+RUN git clone -b ${ANALOG_LIB_BRANCH} ${ANALOG_LIB_GIT} ${BUILD_DEST}/analog
+# && \
+#    mv ${BUILD_DEST}/analog/analog /usr/lib/analog
+
+WORKDIR /local/src
