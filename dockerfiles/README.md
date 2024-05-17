@@ -22,3 +22,27 @@ The primary difference between `prod`, `dev`, and `interactive` images lies in t
 - **interactive**: This image utilizes the `prod` compiler toolchain but includes the `dev` simulation infrastructure. It is designed for interactive use, offering a balance between the lightweight nature of `prod` and the full capabilities of `dev`.
 
 Prod images are significantly smaller than dev images, reflecting their streamlined content without source code.
+
+**prod**
+```
+REPOSITORY                              TAG       IMAGE ID       CREATED        SIZE
+platinumcd/analog-stack                 1.0.0     1e6409f37ef0   12 hours ago   3.87GB
+platinumcd/analog-llvm-riscv-musl       1.0.0     c3958877583a   13 hours ago   2.21GB
+platinumcd/analog-riscv-musl            1.0.0     fe168b1a2ed3   7 days ago     1.88GB
+platinumcd/analog-sst-crosssim          1.0.0     b476259e943e   14 hours ago   2.28GB
+```
+
+**dev**
+```
+REPOSITORY                              TAG       IMAGE ID       CREATED        SIZE
+platinumcd/analog-stack-dev             1.0.0     42018ed990e4   12 hours ago   24.6GB
+platinumcd/analog-llvm-riscv-musl-dev   1.0.0     dd89299b61ad   18 hours ago   16.7GB
+platinumcd/analog-riscv-musl-dev        1.0.0     0c6098d7880f   18 hours ago   12GB
+platinumcd/analog-sst-crosssim-dev      1.0.0     998e122221ea   19 hours ago   8.47GB
+```
+
+**interactive**
+```
+REPOSITORY                              TAG       IMAGE ID       CREATED        SIZE
+platinumcd/analog-interactive-stack     1.0.0     8d12f4fd2bd2   13 hours ago   10.1GB
+```
