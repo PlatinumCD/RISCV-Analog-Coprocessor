@@ -10,10 +10,10 @@ This repository contains the build infrastructure for integrating and utilizing 
 2. **Custom LLVM Toolchain**: [LLVM Project](https://github.com/PlatinumCD/llvm-project) (llvm-riscv)
    - A custom LLVM RISC-V musl cross-compiler that ensures compatibility with the analog stack.
 
-3. **Custom SST Elements**: [SST Elements](https://github.com/PlatinumCD/sst-elements) (refactor)
+3. **Custom SST Elements**: [SST Elements](https://github.com/PlatinumCD/sst-elements/tree/refactor) (refactor)
    - Provides elements from the Structural Simulation Toolkit (SST), including Golem and CrossSim, to enable the simulation of analog behaviors.
 
-4. **Build Infrastructure**: [Build Scripts](https://github.com/PlatinumCD/RISCV-Analog-Coprocessor) (main)
+4. **Build Infrastructure**: [Build Infrastructure](https://github.com/PlatinumCD/RISCV-Analog-Coprocessor) (main)
    - Contains Dockerfiles and Makefiles required to set up the entire build environment.
 
 ## Building and Running The Environment
