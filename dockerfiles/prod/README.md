@@ -1,93 +1,107 @@
-# Project Repository
+# Comprehensive Production Environment for Analog, RISC-V, LLVM, and SST CrossSim
 
-This project contains several development environments for different purposes, as well as their production counterparts. Each directory contains a `Dockerfile` and a `Makefile` to build the respective Docker images. Below is a description of each directory, the arguments used in their respective Makefiles, and how to build the images using these Makefiles.
+This repository contains a multi-faceted production environment that facilitates the integration and interaction between various sophisticated systems: the Analog library, RISC-V toolchain, LLVM, and SST CrossSim. The project is structured into several subdirectories, each encapsulating the Dockerized setup required to streamline the production processes for these systems.
 
-## Directories Overview
-1. `analog-stack`
-2. `llvm-riscv-musl`
-3. `riscv-musl`
-4. `sst-crosssim`
+## Directory Structure
 
-Each directory has specific build arguments and targets defined in the Makefile. Detailed descriptions are provided in their respective README files.
+- `analog-stack/`: Builds the Analog Stack integrating LLVM and SST CrossSim.
+- `llvm-riscv-musl/`: Provides the setup to compile and build LLVM targeting RISC-V architecture with MUSL.
+- `riscv-musl/`: Contains the setup required to build a RISC-V toolchain with MUSL support.
+- `sst-crosssim/`: Focuses on setting up SST CrossSim, a framework for simulating computer architecture.
 
-### Development vs Production
-- **Development (dev):** Typically includes additional dependencies, debug symbols, and tools necessary for the ongoing development and testing processes.
-- **Production (prod):** Optimized for deployment, with a focus on smaller image sizes and may exclude debug tools and unnecessary dependencies.
+## Building the Environment
 
-## Building Docker Images
+### Prerequisites
 
-To build a Docker image, navigate to the directory and use the `make` command with the desired target:
+1. Docker
+2. Make
 
-```bash
-cd <directory_name>
-make <target>
-```
+### Steps to Build
 
-By default, running `make` without a target will execute the `all` target, which builds the image.
+1. **Build the Entire Environment**:
+   From the top-level directory, you can build all required Docker images using:
+   ```sh
+   make build
+   ```
 
-Sample Usage:
+2. **Run the SST CrossSim Example**:
+    After the build process is complete, you can launch the SST CrossSim example using:
+   ```sh
+   make run
+   ```
 
-```bash
-cd analog-stack
-make image
-```
+## Subdirectory Details
 
-## Pushing Docker Images
+### analog-stack
 
-Some directories support pushing built images to a Docker registry:
+Contains the Docker setup to integrate the Analog library with the LLVM RISC-V compiler and SST CrossSim. This image is the culminating build merging all components. Commands available in this subdirectory:
 
-```bash
-make push
-```
+- Build the image:
+  ```sh
+  make image
+  ```
 
-Sample Usage:
+- Push the image to Docker Hub:
+  ```sh
+  make push
+  ```
 
-```bash
-cd llvm-riscv-musl
-make push
-```
+### llvm-riscv-musl
 
-For detailed build arguments and other options, refer to the README files in each directory.
+Sets up an environment to build the LLVM compiler targeting the RISC-V architecture with MUSL. The provided Makefile and Dockerfile detail the required build steps and dependencies. Commands available in this subdirectory:
 
-## Automated Build Script
+- Build the image:
+  ```sh
+  make image
+  ```
 
-The `build_prod.sh` script in the root directory automates the build process for all production images. It allows you to set global environment variables for the build process.
+- Push the image to Docker Hub:
+  ```sh
+  make push
+  ```
 
-### Global Environment Variables
+- Run tests:
+  ```sh
+  make test
+  ```
 
-- `RELEASE`: The release version of the Docker images. Default is `1.0.0`.
-- `PLATFORM`: The target platform(s) for the Docker images. Default is `linux/amd64,linux/arm64`.
-- `DOCKERHUB_USER`: The Docker Hub username to tag the images.
-- `BUILD_SRC`: Source build directory. Default is `/src`.
-- `BUILD_DEST`: Destination build directory. Default is `/opt`.
-- `NUM_THREADS`: Number of threads to use for building. Default is `32`.
+- Clean test outputs:
+  ```sh
+  make clean-test
+  ```
 
-### Specific Image Arguments
+### riscv-musl
 
-- **SST-CrossSim:**
-  - `SST_CROSSSIM_IMAGE_NAME`
-  - `CROSSSIM_GIT`
-  - `CROSSSIM_BRANCH`
-  - `SSTCORE_GIT`
-  - `SSTCORE_BRANCH`
-  - `SSTELEMENTS_GIT`
-  - `SSTELEMENTS_BRANCH`
-- **RISC-V Musl Compiler:**
-  - `RISCV_MUSL_IMAGE_NAME`
-  - `RISCV_GIT`
-  - `RISCV_BRANCH`
-- **LLVM RISC-V Musl Cross-compiler:**
-  - `LLVM_RISCV_MUSL_IMAGE_NAME`
-  - `LLVM_GIT`
-  - `LLVM_BRANCH`
-- **Build Type:** Can be `image` or `push`.
+Focuses on downloading and building the RISC-V toolchain with MUSL support, including compilers and linkers necessary for cross-compiling applications. Commands available in this subdirectory:
 
-### Usage
+- Build the image:
+  ```sh
+  make image
+  ```
 
-To run the script, use:
+- Push the image to Docker Hub:
+  ```sh
+  make push
+  ```
 
-```bash
-./build_prod.sh
-```
+### sst-crosssim
 
-This script will navigate to each directory, set the appropriate build arguments, and execute the specified target (`image` or `push`).
+Prepares the environment to install and set up SST CrossSim, a simulation framework used for modeling and studying computer architectures. This setup includes necessary dependencies and configurations. Commands available in this subdirectory:
+
+- Build the image:
+  ```sh
+  make image
+  ```
+
+- Push the image to Docker Hub:
+  ```sh
+  make push
+  ```
+
+## Main Application
+
+The `src` directory contains example code and scripts demonstrating the use of the analog library in conjunction with SST CrossSim. The top-level `Makefile` orchestrates the build process across all subdirectories, ensuring seamless integration.
+
+## Conclusion
+
+This comprehensive setup allows developers and researchers to work with complex simulations and compiler toolchains using Docker containers. The layered architecture enables easy modification, testing, and integration of different components, facilitating advanced development workflows in computer architecture simulations and compiler construction.

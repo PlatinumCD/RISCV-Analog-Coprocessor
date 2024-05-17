@@ -8,5 +8,6 @@ ARCH=rv64g
 $CC                                \
     --gcc-toolchain=$GCC_TOOLCHAIN \
     --target=$TARGET               \
-    -march=$ARCH -static -v          \
+    -march=$ARCH -static           \
+    -I $BUILD_DEST/analog          \
     $1 -o "${1%.cpp}_cpp.out"
