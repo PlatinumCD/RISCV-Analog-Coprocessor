@@ -9,6 +9,8 @@ This repository contains a multi-faceted production environment that facilitates
 - `riscv-musl/`: Contains the setup required to build a RISC-V toolchain with MUSL support.
 - `sst-crosssim/`: Focuses on setting up SST CrossSim, a framework for simulating computer architecture.
 
+**Save time by using `make pull` in `llvm-riscv-musl` and `riscv-musl`**
+
 ## Building the Environment
 
 ### Prerequisites
