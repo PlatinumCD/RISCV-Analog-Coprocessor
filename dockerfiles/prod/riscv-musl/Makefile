@@ -24,6 +24,9 @@ image:
 		-t "$(DOCKERHUB_USER)/$(RISCV_MUSL_IMAGE_NAME):$(RELEASE)" \
 		.
 
+pull:
+	docker pull "$(DOCKERHUB_USER)/$(RISCV_MUSL_IMAGE_NAME):$(RELEASE)"
+
 push:
 	docker build \
 		--build-arg BUILD_SRC=$(BUILD_SRC) \

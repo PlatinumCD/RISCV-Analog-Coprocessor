@@ -29,6 +29,9 @@ image:
 		-t "$(DOCKERHUB_USER)/$(LLVM_RISCV_MUSL_IMAGE_NAME):$(RELEASE)" \
 		.
 
+pull:
+	docker pull "$(DOCKERHUB_USER)/$(LLVM_RISCV_MUSL_IMAGE_NAME):$(RELEASE)"
+
 push:
 	docker build \
 		--build-arg DOCKERHUB_USER=$(DOCKERHUB_USER) \

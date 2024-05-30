@@ -60,6 +60,11 @@ Sets up an environment to build the LLVM compiler targeting the RISC-V architect
   make push
   ```
 
+- Pull the image from Docker Hub:
+  ```sh
+  make pull
+  ```
+
 - Run tests:
   ```sh
   make test
@@ -78,6 +83,10 @@ Focuses on downloading and building the RISC-V toolchain with MUSL support, incl
   ```sh
   make image
   ```
+
+- Pull the image from Docker Hub:
+  ```sh
+  make pull
 
 - Push the image to Docker Hub:
   ```sh
