@@ -49,7 +49,9 @@ push:
 test:
 	./cpp_compiler ./tests/hello_world.cpp
 	./cpp_compiler ./tests/loop.cpp
+	./cpp_compiler ./tests/intrinsics.cpp
 
 clean-test:
 	rm -rf ./tests/hello_world_cpp.out
 	rm -rf ./tests/loop_cpp.out
+	rm -rf ./tests/intrinsics_cpp.out
