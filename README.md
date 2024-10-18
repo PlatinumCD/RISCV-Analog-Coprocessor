@@ -34,7 +34,7 @@ make
 
 Build the SST Core, SST Elements, and CrossSim Image (Incomplete):
 ```bash
-cd dockerfiles/
+cd dockerfiles/sst-crosssim
 make
 ```
 
