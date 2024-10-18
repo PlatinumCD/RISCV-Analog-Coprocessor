@@ -1,56 +1,41 @@
 # RISC-V Analog Coprocessor
 
-This repository contains the build infrastructure for integrating and utilizing several key components in the RISC-V Analog Coprocessor project. These include the Analog library, a custom LLVM toolchain, custom SST elements, and the build scripts. This setup supports a seamless development, production, and interactive usage experience.
+The RISC-V Analog Coprocessor project is designed to extend the RISC-V architecture with analog processing capabilities, enabling the simulation and development of systems that integrate both digital and analog components. This environment provides a custom LLVM-based toolchain and Structural Simulation Toolkit (SST) elements, including Golem and CrossSim, to facilitate seamless simulation of analog behavior within RISC-V systems.
+
+By integrating an SST simulator infrastructure specifically tailored for analog applications, this project allows researchers and developers to explore the interaction between analog and digital processing in a unified simulation environment. The analog stack is fully supported by a cross-compiling toolchain and custom SST elements, making it possible to simulate, prototype, and analyze analog components alongside standard digital workflows.
 
 ## Components
 
-1. **Analog Library**: [Analog Library](https://github.com/PlatinumCD/analog-library) (main)
-   - Used to implement analog capabilities within the simulation and toolchain.
-   
-2. **Custom LLVM Toolchain**: [LLVM Project](https://github.com/PlatinumCD/llvm-project) (llvm-riscv)
-   - A custom LLVM RISC-V musl cross-compiler that ensures compatibility with the analog stack.
+1. **Custom LLVM Toolchain**: [LLVM Project](https://github.com/PlatinumCD/llvm-project) (llvm-riscv)
+   - A modified version of LLVM with custom instructions designed for the analog coprocessor.
 
-3. **Custom SST Elements**: [SST Elements](https://github.com/PlatinumCD/sst-elements/tree/refactor) (refactor)
-   - Provides elements from the Structural Simulation Toolkit (SST), including Golem and CrossSim, to enable the simulation of analog behaviors.
-
-4. **Build Infrastructure**: [Build Infrastructure](https://github.com/PlatinumCD/RISCV-Analog-Coprocessor) (main)
+2. **Build Infrastructure**: [Build Infrastructure](https://github.com/PlatinumCD/RISCV-Analog-Coprocessor) (main)
    - Contains Dockerfiles and Makefiles required to set up the entire build environment.
 
-## Building and Running The Environment
+3. **Custom SST Elements**: [SST Elements](https://github.com/PlatinumCD/sst-elements/tree/refactor) (refactor)
+   - Provides elements from the Structural Simulation Toolkit (SST), including Golem and CrossSim, to enable the simulation of analog programs.
 
-The environment can be built in three different ways: **Production**, **Development**, and **Interactive**. Each approach uses Docker for containerization but serves different use cases.
+4. **Analog Library**: [Analog Library](https://github.com/PlatinumCD/analog-library) (main)
+   - A C++ library designed to assist in the creation of analog applications.
 
-### Production Environment
+## How to use
 
-The production environment is optimized for deployment. It does not contain the source code of built binaries, making the images smaller and ideal for execution.
-
-To build and run the production environment:
-```sh
-cd dockerfiles/prod
-make build
-make run
+Build the RISCV musl Toolchain:
+```bash
+cd dockerfiles/riscv-musl
+make
 ```
 
-### Development Environment
-
-The development environment includes the source code and all necessary tools and dependencies for developing and debugging the software.
-
-To build and run the development environment:
-```sh
-cd dockerfiles/dev
-make build
-make run
+Build the LLVM RISCV cross-compiler (Relies on RISCV musl Toolchain):
+```bash
+cd dockerfiles/llvm-riscv-musl
+make
 ```
 
-### Interactive Environment
-
-The interactive environment strikes a balance between the production and development setups. It uses the production compiler toolchain but includes the development simulation infrastructure, allowing for interactive use.
-
-To build and run the interactive environment:
-```sh
-cd dockerfiles/interactive
-make build
-make run
+Build the SST Core, SST Elements, and CrossSim Image (Incomplete):
+```bash
+cd dockerfiles/
+make
 ```
 
 ## Conclusion

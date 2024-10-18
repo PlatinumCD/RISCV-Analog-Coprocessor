@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS builder
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Build Args
@@ -24,8 +24,13 @@ ADD ./gitmodules ${BUILD_SRC}/.gitmodules
 RUN git clone -b ${RISCV_BRANCH} ${RISCV_GIT} ${BUILD_SRC}/riscv && \
     cd ${BUILD_SRC}/riscv && \
     mv ${BUILD_SRC}/.gitmodules ${BUILD_SRC}/riscv/.gitmodules && \
-    ./configure --prefix=${BUILD_DEST}/riscv && \
+    ./configure --prefix=${BUILD_DEST}/riscv --enable-threads=posix && \
     make -j ${NUM_THREADS} musl
+
+# Copy build to new image
+FROM ubuntu:22.04
+ARG BUILD_DEST
+COPY --from=builder ${BUILD_DEST} ${BUILD_DEST}
 
 # Add RISC-V binaries to $PATH
 ENV PATH="${PATH}:${BUILD_DEST}/riscv/bin"
