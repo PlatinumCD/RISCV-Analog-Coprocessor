@@ -32,7 +32,7 @@ RUN mkdir ${BUILD_SRC}/llvm-project/build && \
         -DCMAKE_INSTALL_PREFIX="${BUILD_DEST}/llvm"  \
         -DCMAKE_BUILD_TYPE=Release  \
         -DLLVM_ENABLE_PROJECTS="clang" \
-        -DBUILD_SHARED_LIBS=True \
+        -DBUILD_SHARED_LIBS=False \
         -DLLVM_OPTIMIZED_TABLEGEN=ON \
         -DLLVM_BUILD_TESTS=False \
         -DLLVM_TARGETS_TO_BUILD="RISCV" \
@@ -48,7 +48,7 @@ RUN mkdir -p ${BUILD_SRC}/llvm-project/openmp/build && \
         -DCMAKE_TOOLCHAIN_FILE=${BUILD_SRC}/analog_riscv_toolchain.cmake \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=${BUILD_DEST}/riscv/sysroot/usr \
-        -DLIBOMP_ENABLE_SHARED=ON \
+        -DLIBOMP_ENABLE_SHARED=OFF \
         -DLIBOMP_ARCH="riscv64" \
         -DLIBOMP_CROSS_COMPILING=ON \
         -DOPENMP_ENABLE_LIBOMPTARGET=OFF \
