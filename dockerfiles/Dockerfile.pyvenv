@@ -1,0 +1,11 @@
+FROM analog-master-riscv:1.0.0
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG BUILD_SRC
+ARG BUILD_DEST
+ARG NUM_THREADS
+
+#──────────── Python venv ────────────#
+RUN python3.11 -m venv ${BUILD_DEST}/mlir_venv && \
+    . ${BUILD_DEST}/mlir_venv/bin/activate && \
+    python -m pip install --no-cache-dir -r /resources/requirements/requirements.txt

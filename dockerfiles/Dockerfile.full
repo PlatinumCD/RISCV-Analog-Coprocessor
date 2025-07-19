@@ -1,0 +1,62 @@
+FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+ENV BUILD_SRC=/src
+ENV BUILD_DEST=/opt
+ENV NUM_THREADS=32
+ENV RISCV_GIT=https://github.com/riscv-collab/riscv-gnu-toolchain.git
+ENV RISCV_BRANCH=master
+ENV LLVM_GIT=https://github.com/PlatinumCD/llvm-project.git
+ENV LLVM_BRANCH=llvm-riscv
+
+#──────────── system deps ────────────#
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+        autoconf automake bc bison build-essential ca-certificates ccache clang \
+        cmake curl flex gawk git gperf libexpat-dev libglib2.0-dev libgmp-dev \
+        libmpc-dev libmpfr-dev libtool ninja-build patchutils python3.11 \
+        python3.11-venv python3.11-dev python3.11-distutils python3-pip \
+        texinfo unzip wget zlib1g-dev && \
+    rm -rf /var/lib/apt/lists/*
+COPY resources /resources
+
+#──────────── RISC-V toolchain ────────────#
+RUN git clone -b ${RISCV_BRANCH} --single-branch ${RISCV_GIT} ${BUILD_SRC}/riscv && \
+    cd ${BUILD_SRC}/riscv && \
+    mv /resources/gitmodules .gitmodules && \
+    ./configure --prefix=${BUILD_DEST}/riscv --enable-threads=posix && \
+    make -j${NUM_THREADS} musl
+
+#──────────── Python venv ────────────#
+#RUN python3.11 -m venv ${BUILD_DEST}/mlir_venv && \
+#    . ${BUILD_DEST}/mlir_venv/bin/activate && \
+#    python -m pip install --no-cache-dir -r /resources/requirements/requirements.txt
+#
+##──────────── LLVM / MLIR / Clang ────────────#
+#RUN git clone -b ${LLVM_BRANCH} --single-branch ${LLVM_GIT} ${BUILD_SRC}/llvm-project
+#
+#RUN cd ${BUILD_SRC}/llvm-project/build && \
+#    cmake -G Ninja -S ../llvm \
+#        -DCMAKE_INSTALL_PREFIX=${BUILD_DEST}/llvm \
+#        -DLLVM_ENABLE_PROJECTS="clang;mlir" \
+#        -DLLVM_TARGETS_TO_BUILD="RISCV" \
+#        -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_ASSERTIONS=ON \
+#        -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+#        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+#        -DBUILD_SHARED_LIBS=OFF \
+#        -DLLVM_DEFAULT_TARGET_TRIPLE="riscv64-unknown-linux-musl" \
+#        -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
+#        -DPython3_EXECUTABLE=$(which python3.11) && \
+#    cmake --build . --target install -j${NUM_THREADS}
+#
+##──────────── OpenMP runtime ────────────#
+#RUN mkdir -p ${BUILD_SRC}/llvm-project/openmp/build && \
+#    cd ${BUILD_SRC}/llvm-project/openmp/build && \
+#    cmake -G Ninja -S .. \
+#        -DCMAKE_TOOLCHAIN_FILE=/resources/analog_riscv_toolchain.cmake \
+#        -DCMAKE_INSTALL_PREFIX=${BUILD_DEST}/riscv/sysroot/usr \
+#        -DCMAKE_BUILD_TYPE=Release \
+#        -DLIBOMP_ENABLE_SHARED=OFF \
+#        -DLIBOMP_ARCH="riscv64" -DLIBOMP_CROSS_COMPILING=ON \
+#        -DOPENMP_ENABLE_LIBOMPTARGET=OFF && \
+#    cmake --build . --target install -j${NUM_THREADS}

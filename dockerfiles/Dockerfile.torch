@@ -1,0 +1,35 @@
+FROM analog-master-openmp:1.0.0
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG BUILD_SRC
+ARG BUILD_DEST
+ARG NUM_THREADS
+
+ENV TORCH_MLIR_GIT=https://github.com/PlatinumCD/torch-mlir.git
+ENV TORCH_MLIR_BRANCH=analog-dialect
+
+RUN git clone -b ${TORCH_MLIR_BRANCH}  --single-branch ${TORCH_MLIR_GIT} ${BUILD_SRC}/torch-mlir
+
+ENV PATH=${PATH}:${BUILD_DEST}/llvm-project/bin/
+RUN mkdir ${BUILD_SRC}/torch-mlir/build && \
+    cd ${BUILD_SRC}/torch-mlir/build && \
+    . ${BUILD_DEST}/mlir_venv/bin/activate && \
+    cmake -G Ninja -S .. \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=${BUILD_DEST}/torch-mlir \
+        -DMLIR_DIR=${BUILD_DEST}/llvm-project/lib/cmake/mlir \
+        -DLLVM_DIR=${BUILD_DEST}/llvm-project/lib/cmake/llvm \
+        -DCMAKE_C_COMPILER=clang \
+        -DCMAKE_CXX_COMPILER=clang++ \
+        -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+        -DTORCH_MLIR_ENABLE_STABLEHLO=OFF \
+        -DDTORCH_MLIR_INCLUDE_TESTS=OFF \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DPython3_FIND_VIRTUALENV=ONLY \
+        -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
+        -DLLVM_ENABLE_ASSERTIONS=ON \
+        -DPython3_EXECUTABLE=$(which python3.11) && \
+    cmake --build . --target install -j${NUM_THREADS}
+
+RUN cp ${BUILD_SRC}/torch-mlir/build/python_packages/torch_mlir/torch_mlir/_mlir_libs/_jit_ir_importer* ${BUILD_DEST}/torch-mlir/python_packages/torch_mlir/torch_mlir/_mlir_libs/.

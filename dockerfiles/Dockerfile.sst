@@ -1,0 +1,28 @@
+FROM analog-master-torch:1.0.0
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG BUILD_SRC
+ARG BUILD_DEST
+ARG NUM_THREADS
+
+ENV SST_CORE_GIT=https://github.com/sstsimulator/sst-core.git
+ENV SST_CORE_BRANCH=v15.0.0_Final
+
+ENV SST_ELEMENTS_GIT=https://github.com/sstsimulator/sst-elements.git
+ENV SST_ELEMENTS_BRANCH=v15.0.0_Final
+
+RUN git clone -b ${SST_CORE_BRANCH} --single-branch ${SST_CORE_GIT} ${BUILD_SRC}/sst-core
+RUN cd ${BUILD_SRC}/sst-core && ./autogen.sh && \
+    mkdir build && \
+    cd build && \
+    ../configure MPICC=/bin/mpicc MPICXX=/bin/mpic++ --prefix=${BUILD_DEST}/sst-core && \
+    make -j ${NUM_THREADS} install
+
+ENV PATH=${PATH}:${BUILD_DEST}/sst-core/bin
+RUN git clone -b ${SST_ELEMENTS_BRANCH} --single-branch ${SST_ELEMENTS_GIT} ${BUILD_SRC}/sst-elements
+RUN cd ${BUILD_SRC}/sst-elements && ./autogen.sh && \
+    mkdir build && \
+    cd build && \
+    ../configure MPICC=/bin/mpicc MPICXX=/bin/mpic++ --prefix=${BUILD_DEST}/sst-elements && \
+    make -j ${NUM_THREADS} install
+

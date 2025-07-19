@@ -1,0 +1,18 @@
+FROM analog-master-llvm:1.0.0
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG BUILD_SRC
+ARG BUILD_DEST
+ARG NUM_THREADS
+
+#──────────── OpenMP runtime ────────────#
+RUN mkdir -p ${BUILD_SRC}/llvm-project/openmp/build && \
+    cd ${BUILD_SRC}/llvm-project/openmp/build && \
+    cmake -G Ninja -S .. \
+        -DCMAKE_TOOLCHAIN_FILE=/resources/analog_riscv_toolchain.cmake \
+        -DCMAKE_INSTALL_PREFIX=${BUILD_DEST}/riscv/sysroot/usr \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DLIBOMP_ENABLE_SHARED=OFF \
+        -DLIBOMP_ARCH="riscv64" -DLIBOMP_CROSS_COMPILING=ON \
+        -DOPENMP_ENABLE_LIBOMPTARGET=OFF && \
+    cmake --build . --target install -j${NUM_THREADS}
