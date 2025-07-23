@@ -1,8 +1,3 @@
-[submodule "external_packages/riscv-gnu-toolchain"]
-	path = external_packages/riscv-gnu-toolchain
-	url = https://github.com/riscv-collab/riscv-gnu-toolchain.git
-	branch = master
-	shallow = true
 [submodule "external_packages/llvm-project"]
 	path = external_packages/llvm-project
 	url = https://github.com/PlatinumCD/llvm-project.git
@@ -12,4 +7,9 @@
 	path = external_packages/torch-mlir
 	url = https://github.com/PlatinumCD/torch-mlir.git
 	branch = analog-dialect
+	shallow = true
+[submodule "external_packages/riscv-gnu-toolchain"]
+	path = external_packages/riscv-gnu-toolchain
+	url = https://github.com/riscv-collab/riscv-gnu-toolchain.git
+	branch = master
 	shallow = true
