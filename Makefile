@@ -3,7 +3,7 @@ RELEASE?=1.0.0
 DOCKERHUB_USER?=platinumcd
 IMAGE_NAME?=analog-master
 
-all: submodules build install
+all: download build install
 
 docker:
 	docker build \
@@ -13,9 +13,9 @@ docker:
 		--build-arg NUM_THREADS=$(NUM_THREADS) \
 		.
 
-submodules:
-	@echo "→ Initializing submodules..."
-	@git submodule update --init --depth 1
+download:
+	@echo "→ Downloading external packages..."
+	@bash scripts/download.sh
 
 build:
 	@echo "→ Running build script..."

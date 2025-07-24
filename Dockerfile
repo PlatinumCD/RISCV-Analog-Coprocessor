@@ -30,19 +30,19 @@ RUN apt-get update -y && \
         texinfo unzip vim wget zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
 
-COPY resources /resources
+COPY utils /utils
 
 #──────────── RISC-V toolchain ────────────#
-RUN git clone -b ${RISCV_BRANCH} --single-branch ${RISCV_GIT} ${BUILD_SRC}/riscv && \
-    cd ${BUILD_SRC}/riscv && \
-    mv /resources/gitmodules .gitmodules && \
-    ./configure --prefix=${BUILD_DEST}/riscv --enable-threads=posix && \
+RUN git clone -b ${RISCV_BRANCH} --single-branch ${RISCV_GIT} ${BUILD_SRC}/riscv-gnu-toolchain && \
+    cd ${BUILD_SRC}/riscv-gnu-toolchain && \
+    mv /utils/riscv-gnu-toolchain/gitmodules .gitmodules && \
+    ./configure --prefix=${BUILD_DEST}/riscv-gnu-toolchain --enable-threads=posix && \
     make -j${NUM_THREADS} musl
 
 #──────────── Python venv ────────────#
 RUN python3.11 -m venv ${BUILD_DEST}/mlir_venv && \
     . ${BUILD_DEST}/mlir_venv/bin/activate && \
-    python -m pip install --no-cache-dir -r /resources/requirements/requirements.txt
+    python -m pip install --no-cache-dir -r /utils/pyvenv/requirements.txt
 
 #──────────── LLVM / MLIR / Clang ────────────#
 RUN git clone -b ${LLVM_BRANCH} --single-branch ${LLVM_GIT} ${BUILD_SRC}/llvm-project
@@ -69,8 +69,8 @@ RUN mkdir ${BUILD_SRC}/llvm-project/build && \
 RUN mkdir -p ${BUILD_SRC}/llvm-project/openmp/build && \
     cd ${BUILD_SRC}/llvm-project/openmp/build && \
     cmake -G Ninja -S .. \
-        -DCMAKE_TOOLCHAIN_FILE=/resources/analog_riscv_toolchain.cmake \
-        -DCMAKE_INSTALL_PREFIX=${BUILD_DEST}/riscv/sysroot/usr \
+        -DCMAKE_TOOLCHAIN_FILE=/utils/llvm-omp/llvm_omp_toolchain.cmake \
+        -DCMAKE_INSTALL_PREFIX=${BUILD_DEST}/riscv-gnu-toolchain/sysroot/usr \
         -DCMAKE_BUILD_TYPE=Release \
         -DLIBOMP_ENABLE_SHARED=OFF \
         -DLIBOMP_ARCH="riscv64" -DLIBOMP_CROSS_COMPILING=ON \
@@ -108,8 +108,7 @@ RUN cp ${BUILD_SRC}/torch-mlir/build/python_packages/torch_mlir/torch_mlir/_mlir
 #──────────── SST-Core ────────────#
 RUN git clone -b ${SST_CORE_BRANCH} --single-branch ${SST_CORE_GIT} ${BUILD_SRC}/sst-core
 RUN cd ${BUILD_SRC}/sst-core && ./autogen.sh && \
-    mkdir build && \
-    cd build && \
+    mkdir build && cd build && \
     ../configure MPICC=/bin/mpicc MPICXX=/bin/mpic++ --prefix=${BUILD_DEST}/sst-core && \
     make -j ${NUM_THREADS} install
 
@@ -117,7 +116,6 @@ RUN cd ${BUILD_SRC}/sst-core && ./autogen.sh && \
 ENV PATH=${PATH}:${BUILD_DEST}/sst-core/bin
 RUN git clone -b ${SST_ELEMENTS_BRANCH} --single-branch ${SST_ELEMENTS_GIT} ${BUILD_SRC}/sst-elements
 RUN cd ${BUILD_SRC}/sst-elements && ./autogen.sh && \
-    mkdir build && \
-    cd build && \
+    mkdir build && cd build && \
     ../configure MPICC=/bin/mpicc MPICXX=/bin/mpic++ --prefix=${BUILD_DEST}/sst-elements && \
     make -j ${NUM_THREADS} install
