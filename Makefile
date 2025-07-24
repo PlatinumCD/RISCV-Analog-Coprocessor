@@ -3,6 +3,10 @@ RELEASE?=1.0.0
 DOCKERHUB_USER?=platinumcd
 IMAGE_NAME?=analog-master
 
+BUILD_SRC?=/src
+BUILD_DEST?=/opt
+NUM_THREADS?=32
+
 all: download build install
 
 docker:
