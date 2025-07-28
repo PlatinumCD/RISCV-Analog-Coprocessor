@@ -69,7 +69,7 @@ RUN mkdir ${BUILD_SRC}/llvm-project/build && \
 RUN mkdir -p ${BUILD_SRC}/llvm-project/openmp/build && \
     cd ${BUILD_SRC}/llvm-project/openmp/build && \
     cmake -G Ninja -S .. \
-        -DCMAKE_TOOLCHAIN_FILE=/utils/llvm-openmp/llvm_omp_toolchain.cmake \
+        -DCMAKE_TOOLCHAIN_FILE=/utils/llvm-omp/llvm_omp_toolchain.cmake \
         -DCMAKE_INSTALL_PREFIX=${BUILD_DEST}/riscv-gnu-toolchain/sysroot/usr \
         -DCMAKE_BUILD_TYPE=Release \
         -DLIBOMP_ENABLE_SHARED=OFF \
