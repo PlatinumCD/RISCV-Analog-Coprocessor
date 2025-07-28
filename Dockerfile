@@ -123,7 +123,9 @@ RUN cd ${BUILD_SRC}/sst-elements && ./autogen.sh && \
 #──────────── Fresh Image ────────────#
 FROM ubuntu:22.04
 ARG BUILD_DEST
+ARG BUILD_SRC
 COPY --from=builder ${BUILD_DEST} ${BUILD_DEST}
+COPY --from=builder ${BUILD_SRC}/sst-elements ${BUILD_SRC}/sst-elements
 
 # Add LLVM binaries to $PATH
 ENV BUILD_DEST="${BUILD_DEST}"
@@ -131,3 +133,6 @@ ENV PATH="${PATH}:${BUILD_DEST}/riscv-gnu-toolchain/bin"
 ENV PATH="${PATH}:${BUILD_DEST}/llvm-project/bin"
 ENV PATH="${PATH}:${BUILD_DEST}/torch-mlir/bin"
 ENV PATH="${PATH}:${BUILD_DEST}/sst-core/bin"
+
+RUN apt update && apt install -y \
+    libpython3.11 libopenmpi-dev vim
