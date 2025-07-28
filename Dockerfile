@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS builder
 ENV DEBIAN_FRONTEND=noninteractive
 
 ARG BUILD_SRC
@@ -69,7 +69,7 @@ RUN mkdir ${BUILD_SRC}/llvm-project/build && \
 RUN mkdir -p ${BUILD_SRC}/llvm-project/openmp/build && \
     cd ${BUILD_SRC}/llvm-project/openmp/build && \
     cmake -G Ninja -S .. \
-        -DCMAKE_TOOLCHAIN_FILE=/utils/llvm-omp/llvm_omp_toolchain.cmake \
+        -DCMAKE_TOOLCHAIN_FILE=/utils/llvm-openmp/llvm_omp_toolchain.cmake \
         -DCMAKE_INSTALL_PREFIX=${BUILD_DEST}/riscv-gnu-toolchain/sysroot/usr \
         -DCMAKE_BUILD_TYPE=Release \
         -DLIBOMP_ENABLE_SHARED=OFF \
@@ -118,3 +118,16 @@ RUN cd ${BUILD_SRC}/sst-elements && ./autogen.sh && \
     mkdir build && cd build && \
     ../configure MPICC=/bin/mpicc MPICXX=/bin/mpic++ --prefix=${BUILD_DEST}/sst-elements && \
     make -j ${NUM_THREADS} install
+
+
+#──────────── Fresh Image ────────────#
+FROM ubuntu:22.04
+ARG BUILD_DEST
+COPY --from=builder ${BUILD_DEST} ${BUILD_DEST}
+
+# Add LLVM binaries to $PATH
+ENV BUILD_DEST="${BUILD_DEST}"
+ENV PATH="${PATH}:${BUILD_DEST}/riscv-gnu-toolchain/bin"
+ENV PATH="${PATH}:${BUILD_DEST}/llvm-project/bin"
+ENV PATH="${PATH}:${BUILD_DEST}/torch-mlir/bin"
+ENV PATH="${PATH}:${BUILD_DEST}/sst-core/bin"
