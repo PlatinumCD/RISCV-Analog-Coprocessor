@@ -156,7 +156,9 @@ fi
 export CFLAGS="$CFLAGS -I$BUILD_DEST/libffi/include"
 export CXXFLAGS="$CXXFLAGS -I$BUILD_DEST/libffi/include"
 export LDFLAGS="$LDFLAGS -L$BUILD_DEST/libffi/lib"
+export LDFLAGS="$LDFLAGS -L$BUILD_DEST/libffi/lib64"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$BUILD_DEST/libffi/lib"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$BUILD_DEST/libffi/lib64"
 export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$BUILD_DEST/libffi/lib/pkgconfig"
 
 
@@ -197,45 +199,46 @@ export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$BUILD_DEST/pciaccess/lib"
 export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$BUILD_DEST/pciaccess/lib/pkgconfig"
 
 
-# Python3.11
-PYTHON_URL=https://www.python.org/ftp/python/3.11.6/Python-3.11.6.tar.xz
-if [ ! -d $BUILD_SRC/python3.11 ] || [ ! -d $BUILD_DEST/python3.11 ]; then
-    mkdir -p $BUILD_SRC/python3.11
-    pushd $BUILD_SRC/python3.11
+# Python3.13
+PYTHON_URL=https://www.python.org/ftp/python/3.13.0/Python-3.13.0.tar.xz
+if [ ! -d $BUILD_SRC/python3.13 ] || [ ! -d $BUILD_DEST/python3.13 ]; then
+    mkdir -p $BUILD_SRC/python3.13
+    pushd $BUILD_SRC/python3.13
         wget $PYTHON_URL
-        tar -xf Python-3.11.6.tar.xz
-        pushd Python-3.11.6
+        tar -xf Python-3.13.0.tar.xz
+        pushd Python-3.13.0
             ./configure --enable-shared \
-              --prefix="$BUILD_DEST/python3.11" \
-              --with-system-expat --with-system-ffi \
-              CPPFLAGS="$CPPFLAGS" LDFLAGS="$LDFLAGS -Wl,--export-dynamic -Wl,-rpath,$BUILD_DEST/python3.11/lib -Wl,-rpath,$BUILD_DEST/libffi/lib"
+              --prefix="$BUILD_DEST/python3.13" \
+              --with-system-expat --with-system-ffi --disable-gil \
+              CPPFLAGS="$CPPFLAGS" LDFLAGS="$LDFLAGS -Wl,--export-dynamic -Wl,-rpath,$BUILD_DEST/python3.13/lib -Wl,-rpath,$BUILD_DEST/python3.13/lib64 -Wl,-rpath,$BUILD_DEST/libffi/lib -Wl,-rpath,$BUILD_DEST/libffi/lib64"
             make -j $NUM_THREADS install
         popd
     popd
 fi
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_DEST/python3.11/lib
-
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_DEST/python3.13/lib
 
 # ================= Python + CrossSim ================ #
 
-# Python3.11 Venv
+# Python3.13 Venv
 if [ ! -d $BUILD_DEST/analog_venv ]; then
-    $BUILD_DEST/python3.11/bin/python3.11 -m venv $BUILD_DEST/analog_venv
+    $BUILD_DEST/python3.13/bin/python3.13 -m venv $BUILD_DEST/analog_venv
 fi
 
 
 # Activate Venv
 . $BUILD_DEST/analog_venv/bin/activate
-which python3.11
+which python3.13
 
 
 # Install CrossSim
-if ! python3.11 -c "import simulator" &>/dev/null; then
+if ! python3.13 -c "import simulator" &>/dev/null; then
     git clone -b $CROSSSIM_BRANCH --depth 1 $CROSSSIM_GIT $BUILD_SRC/cross-sim
     pushd $BUILD_SRC/cross-sim
-        python3.11 -m pip install --no-cache-dir .
+        python3.13 -m pip install --no-cache-dir .
     popd
 fi
+
+pip install --no-cache-dir cmake
 
 # Install PyLibs
 if ! command -v ninja &>/dev/null; then
@@ -245,7 +248,7 @@ if ! command -v ninja &>/dev/null; then
       numpy pybind11 wheel \
       setuptools cmake ninja \
       packaging pyyaml pillow \
-      dill multiprocess onnx==1.15.0
+      dill multiprocess # onnx==1.15.0
 fi
 
 
@@ -253,7 +256,6 @@ fi
 if [ ! -d $BUILD_SRC/riscv-gnu-toolchain ] || [ ! -d $BUILD_DEST/riscv-gnu-toolchain ]; then
     git clone -b $RISCV_BRANCH --single-branch $RISCV_GIT $BUILD_SRC/riscv-gnu-toolchain
     pushd $BUILD_SRC/riscv-gnu-toolchain
-        cp $UTILS_DIR/riscv-gnu-toolchain/gitmodules_updated .gitmodules
         ./configure --prefix=$BUILD_DEST/riscv-gnu-toolchain
         make -j $NUM_THREADS musl
     popd 
@@ -290,7 +292,7 @@ if [ ! -d "$BUILD_SRC/llvm-project" ] || [ ! -d "$BUILD_DEST/llvm-project" ]; th
               -DBUILD_SHARED_LIBS=OFF \
               -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
               -DLLVM_INSTALL_UTILS=ON \
-              -DPython3_EXECUTABLE=$(which python3.11)
+              -DPython3_EXECUTABLE=$(which python3.13)
             cmake --build . --target install . -j $NUM_THREADS
         popd
     popd
@@ -334,7 +336,7 @@ if [ ! -d "$BUILD_SRC/llvm-project" ] || [ ! -d "$BUILD_DEST/llvm-project" ]; th
               -DPython3_FIND_VIRTUALENV=STANDARD \
               -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
               -DLLVM_ENABLE_ASSERTIONS=ON \
-              -DPython3_EXECUTABLE=$(which python3.11)
+              -DPython3_EXECUTABLE=$(which python3.13)
             cmake --build . --target install -j $NUM_THREADS
             cp python_packages/torch_mlir/torch_mlir/_mlir_libs/_jit_ir_importer* $BUILD_DEST/torch-mlir/python_packages/torch_mlir/torch_mlir/_mlir_libs/.
         popd
@@ -353,17 +355,24 @@ if [ ! -d $BUILD_SRC/sst-core ] || [ ! -d $BUILD_DEST/sst-core ]; then
             ../configure \
                 MPICC=$(which mpicc) \
                 MPICXX=$(which mpic++) \
-                CFLAGS="-O3 $CFLAGS" CXXFLAGS="-O3 $CXXFLAGS" \
+                CFLAGS="-g3 -O0 $CFLAGS" CXXFLAGS="-g3 -O0 $CXXFLAGS" \
                 --prefix=$BUILD_DEST/sst-core \
-                --with-python=$BUILD_DEST/python3.11/bin/python3.11-config
+                --with-python=$BUILD_DEST/python3.13/bin/python3.13-config
 	        make -j $NUM_THREADS install
 	    popd
     popd
 fi
 export PATH=$PATH:$BUILD_DEST/sst-core/bin
 
+# Build with the flags:
+#                CFLAGS="-O3 $CFLAGS" CXXFLAGS="-O3 $CXXFLAGS" \
+# for speed
 
-NUMPY_FLAGS=$(python3.11 -c "import numpy; print(numpy.get_include())")
+
+
+PY_CPPFLAGS="$($BUILD_DEST/python3.13/bin/python3.13-config --includes)"
+PY_LDFLAGS="$($BUILD_DEST/python3.13/bin/python3.13-config --ldflags)"
+NUMPY_FLAGS="$(python3.13 -c "import numpy; print(numpy.get_include())")"
 # ================= SST Elements ================ #
 if [ ! -d $BUILD_SRC/sst-elements ] || [ ! -d $BUILD_DEST/sst-elements ]; then
     git clone -b $SST_ELEMENTS_BRANCH --single-branch $SST_ELEMENTS_GIT $BUILD_SRC/sst-elements
@@ -379,17 +388,31 @@ if [ ! -d $BUILD_SRC/sst-elements ] || [ ! -d $BUILD_DEST/sst-elements ]; then
 	        ../configure \
                 MPICC=$(which mpicc) \
                 MPICXX=$(which mpic++) \
-                CFLAGS="-O3" CXXFLAGS="-O3" \
+		CFLAGS="-g3 -O0" CXXFLAGS="-g3 -O0" \
                 --prefix=$BUILD_DEST/sst-elements \
-                --with-numpy="$NUMPY_FLAGS"
+                --with-numpy="$NUMPY_FLAGS $PY_CPPFLAGS $PY_LDFLAGS"
 	        make -j $NUM_THREADS install
 	    popd
     popd
 fi
 
-exit
+# Build with the flags:
+#                CFLAGS="-O3" CXXFLAGS="-O3" \
+# for speed
 
- # $PY_CPPFLAGS"
-#PY_CPPFLAGS="$($BUILD_DEST/python3.11/bin/python3.11-config --includes)"
-#PY_LDFLAGS="$($BUILD_DEST/python3.11/bin/python3.11-config --ldflags --embed 2>/dev/null || python3.11-config --ldflags)"
 
+# OPTIONAL debugger
+#GDB_URL=https://ftp.gnu.org/gnu/gdb/gdb-14.2.tar.xz
+#GDB_URL=https://sourceware.org/pub/gdb/releases/gdb-14.2.tar.xz
+#if [ ! -d $BUILD_SRC/gdb ] || [ ! -d $BUILD_DEST/gdb ]; then
+#   mkdir -p $BUILD_SRC/gdb
+#   pushd $BUILD_SRC/gdb
+#    	wget $GDB_URL
+#        tar -xf gdb-14.2.tar.xz
+#	    pushd gdb-14.2
+#            ./configure --prefix=$BUILD_DEST/gdb --with-isl=$BUILD_DEST/isl
+#	        make -j $NUM_THREADS
+#		make install
+#	    popd
+#    popd
+#fi
