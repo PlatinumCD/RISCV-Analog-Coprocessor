@@ -1,0 +1,26 @@
+\section{Conclusion}
+
+We have presented the first full-system simulation study of a hybrid analog–digital architecture that tightly couples analog matrix–vector multiplication accelerators with general-purpose RISC-V cores.
+Using our SST-based simulator, we have demonstrated the potential benefits of analog hardware for HPC applications, and shown how the openness of the RISC-V ISA speeds the development of new hardware by taking advantage of a mature software stack.
+
+Importantly, this work is only the first step in both the development of hybrid analog-digital systems using general purpose RISC-V processors.
+There are potential improvements across the entire hardware stack which researchers can explore using the simulation infrastructure presented in this work.
+On the hardware side, there are significant potential improvements to both the memory system, replacing our caches with scratchpads, and optimizing these scratchpads for the memory access patterns common for analog accelerators.
+Furthermore, since our general-purpose CPU is specifically supporting the analog hardware, vector support using the RISC-V Vector extension would likely improve system throughput.
+Additionally, we plan to explore the costs of moving the emulation of floating point operations from a hardened---and by extension inflexible---block within the accelerator to a software implementation running on our general-purpose tile processor.
+On the software side, we are exploring further extensions to our analog BLAS library and working on an MLIR-based compiler infrastructure to further simplify the deployment of applications for analog accelerators.
+On the algorithm side, we are exploring methods to improve the realism of our algorithms, incorporating preconditioners and extending our work to GMRES and other widely used iterative linear solvers.
+Finally, on the simulation side, by coupling these SST simulations with CrossSim, an accuracy simulator for analog arrays, we plan to explore the potential for mixed-precision analog solvers.
+Potentially increasing the total number of iterations to convergence while improving overall system performance through more efficient analog mappings.
+By building on our extensible simulation framework for hybrid architectures, researchers from numerous domains can make explore important aspects of these analog + RISC-V architectures for HPC and other applications.
+
+
+% Using an extended \textit{Vanadis} model in SST and a custom analog accelerator element, we evaluated two representative solvers—CG and BiCGStab—across four core–array configurations and pipeline designs.
+
+
+% Our results show that BiCGStab consistently incurs higher runtime than CG, with only modest sensitivity to pipeline width and functional unit count due to the dominant role of I/O and analog accelerator latency.
+% Scaling the number of cores relative to available analog arrays produced measurable reductions in runtime for both solvers.
+
+% This work establishes an open, extensible simulation framework for hybrid architectures, enabling researchers to explore algorithm–architecture co-design without the cost of fabricating hardware.
+% Future work will focus on expanding the software toolchain with a C++ library for analog kernel invocation, a dedicated compiler to generate analog-enabled instructions, and MLIR passes to automatically map linear and convolution operations to analog kernels.
+% We also plan to extend our evaluation to large-scale, multicore simulations to assess accelerator performance, memory contention, and workload management.

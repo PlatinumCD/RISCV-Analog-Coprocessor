@@ -1,0 +1,77 @@
+\section{Analog MVM Accelerators}
+Analog MVM accelerators have been widely explored over the past decade as a potential solution digital scaling slowdowns.
+The concept of performing MVM operations in the analog domain predates this recent interest~\cite{Genov01}; however, the end of Dennard Scaling and improvements in resistive memory technologies have attracted renewed interest in these accelerators.
+At their core, analog MVM accelerators take advantage of Ohm's Law and Kirchoff's Current Law to perform a matrix vector multiplication.
+To perform a computation $\mat{A}\vec{x} = \vec{y}$, the resistive memory elements in a memory array are programmed inversely proportional to the values of $\mat{A}$ and a voltage input proportional to $\vec{x}$ is applied to all of the wordlines in a memory array.
+By Ohm's Law each resistive element performs a multiplication, and the resulting currents are summed down the bitlines where the dot product can be read out using an analog to digital converter.
+
+There are two important points about this core analog MVM concept which are important for this paper.
+First, for most resistive memories take substantial time and energy to program necessitating applications where the matrix is substantially fixed for the duration of the application.
+Second, the analog values used in the computation may only have 4--8 bits of precision and require various techniques to improve the overall precision of the computation.
+A full discussion of techniques for increasing precision and otherwise optimizing analog MVM accelerators is beyond the scope of this paper, but an interested reader can find a longer discussion in a previous review by Xiao et al.~\cite{AnalogReview}.
+
+\subsection{Analog MVM Accelerators for Linear Solvers}
+The requirements for applications which are tolerant of mixed precision and have substantially fixed matrices has led directly to research on analog accelerators focusing heavily on neural network inference in particular.
+However, several prior works have looked at applications requiring higher precision including iterative linear solvers.
+Importantly, although iterative linear solvers require high precision, the iterative nature of the algorithm provides a similar fixed matrix to amortize costly matrix setup time.
+Feinberg et al., proposed a technique using multiple arrays to emulate high-precision floating point using low-precision fixed point analog arrays~\cite{8416841}.
+Subsequent work by Song et al., improved the convergence and representation efficiency through a modified floating point representation~\cite{10.1145/3581784.3607077}.
+Another approach by Le Gallo et al., proposed using analog MVMs within an iterative refinement scheme to provide high precision results even with low precision MVMs~\cite{LeGallo2017MixedprecisionIC}.
+
+% TODO: Mention Preconditioners, but only if we have space
+
+\subsection{Programming Applications for Analog MVM Accelerators}
+Programmability has not been a major focus for prior work on analog MVM-based accelerators.
+Part of this is downstream of the emphasis on neural network inference where a relatively small number of fixed function units can provide the bulk of the functionality~\cite{9669117}.
+PUMA provides an intermediate approach with a specialized ISA for neural network inference allowing flexibility in layer functionality; however still limited to inference-specific operations~\cite{10.1145/3297858.3304049}.
+However, PUMA still requires a specialized software toolchain to support the custom programming model and ISA.
+This creates a major gap when attempting to apply analog accelerators to complex HPC applications.
+Although the iterative linear solvers evaluated in this paper could be effectively implemented using the PUMA ISA, these applications are merely a starting point for HPC workloads.
+Moreover, the use of standard RISC-V toolchains simplifies porting existing applications to the new hardware accelerators.
+
+% \subsection{Structural Simulation Toolkit}
+% The Structural Simulation Toolkit (SST) is a parallel discrete event simulator designed for computer architecture researcher. 
+
+
+% % SST
+% % SST HPC RISCV
+% % TCL REV
+
+% %\begin{itemize}
+% %    \item Codesign enables efficient and optimized performance
+% %    \item Simulation platforms like SST and CrossSim are simulation engines to understand architecture details
+% %    \item We take advantage of the RoCC interface and build an analog coprocessor, furthering research in hybrid computing
+% %\end{itemize}
+
+% Hardware-software co-design enables efficient, optimized performance by aligning application algorithms with custom hardware capabilities.
+% Simulation platforms such as SST and CrossSim provide comprehensive engines for probing architectural nuances and circuit-level behaviors
+
+
+
+% \subsection{Structural Simulation Toolkit}
+
+% The Structural Simulation Toolkit (SST) is a scalable discrete-event simulation framework which enables simulation across large-scale and high-performance computing platforms.
+% The framework is comprised of interchangable user-defined components that assist in the simulation of novel computer system designs.
+% The components include different memory modules, network interfaces, and processing units.
+
+
+% \subsection{Rocket Custom Coprocessor}
+
+% The Rocket Custom Coprocessor (RoCC) is a microarchitectural interface that originates from The Rocket Chip Generator, a UC Berkeley project that generates general purpose RISC-V processor RTL from high-level sources.
+% The interface facilitates communication between the processor and the coprocessor.
+% Inputs to the interface consist of a 7-bit command and two integer registers.
+% Outputs from the interface consist of a single integer register
+
+
+% %\subsection{Hybrid Computing}
+% %
+% %Hybrid computing is a computing paradigm that employs features from both analog and digital computers.
+% %Hybrid computers initially emerged in the 1960s at the height of analog computing and the dawn of digital computers. 
+% %The advent of the memristor has renewed interest in hybrid computing as a promising approach for low-power, high-performance acceleration.
+% %Memristor crossbars enable rapid matrix-vector multiplication by taking advantage of Ohm's Law. 
+
+% \subsection{CrossSim}
+
+% CrossSim is a Python-based crossbar simulator designed to assess the accuracy of crossbar models.
+% It addresses how resistive crossbars impact the quality of an algorithm's solution by modeling device and circuit non-idealities.
+% CrossSim has API hooks that enable different algorithms to be built on resistive memory array building blocks which give insight into the feasability of the crossbar architecture.

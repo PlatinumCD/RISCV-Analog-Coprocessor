@@ -1,0 +1,35 @@
+\section{Introduction}
+
+%\begin{itemize}
+%    \item Data centers consume an enormous amount of power.
+%    \item Power consumption is expected to double or triple by 2028.
+%    \item Memristors have revived interest in crossbars mvm, a low power solution.
+%    \item To implement crossbar mvms, hardware/software co-design must efficient be done.
+%    \item Simulation is a powerful technique to build architecture prototypes.
+%    \item We build a simulation platform that enables crossbar simulation capable of handling HPC loads.
+%    \item There has been no work done in this field yet - open simulation stack
+%    \item We contribute a full evaluation architecture + performance on ILS (CG)
+%    \item The roadmap is to continue to build infrastructure surrounding it
+%\end{itemize}
+
+With the end of Dennard Scaling, the current technology trajectory for computer systems is toward higher power consumption for higher performance.
+This trend, which applies from small embedded processors up to the largest high-performance computing and data centers, means that increasing problem scale or complexity requires an increasing system power budget.
+To meet this concern, new technology paradigms, which do not rely on conventional digital technology, have become a major research interest with several showing potential for orders-of-magnitude improvements in energy efficiency at the operation level.
+Analog linear algebra acceleration is one such paradigm, taking advantage of the ability of analog circuits to encode various computations. 
+Although not a new idea, developments over the past decade in resistive memory technologies provide dense, programmable, and CMOS-compatible memories, enabling high programmability and integration scale for these analog accelerators.
+Using these technologies, recent analog matrix-vector multiplication (MVM) prototypes have demonstrated greater-than-digital energy efficiency in systems with millions of individual resistive memories~\cite{ambrogio-energy-2023}.
+
+A key challenge for the use of analog accelerators is how to effectively integrate them with conventional digital processing.
+Even if analog components are responsible for the vast majority of the operations, digital systems are still needed for supporting operations such as system configuration, memory and data movement, and other operations which are ill-suited to computation in digital systems.
+To date, most work on analog MVM accelerators that has considered the role of digital in system design has focused on fixed-function digital pipelines or systems specialized for a narrow range of applications with specialized programming models.
+Neither of these approaches are suited to more complex algorithms and workflows such as those found in high-performance computing (HPC) applications.
+
+The RISC-V ISA offers an alternative path.
+By taking advantage of the open ISA, analog accelerators can be directly integrated with digital logic as tightly-coupled accelerators while also having access to a robust set of digital operations and common software ecosystem.
+% TODO: Bridge sentence?
+
+This paper presents the first analysis of a tightly-coupled analog accelerator with a general purpose digital processor.
+To analyze these systems we implement the RISC-V ISA extensions in the cycle-level \textit{Vanadis} RISC-V CPU model of Structural Simulation Toolkit (SST)~\cite{10.1145/1964218.1964225} and developed a new SST element for simulating analog accelerators.
+Using this simulation infrastructure we implement a pair of iterative linear solvers, conjugate gradient (CG) and stabilized biconjugate gradient (BiCG-Stab), and evaluate the scalability of these solvers on analog/digital hybrid systems.
+As part of this analysis we examine how different architectural choices---different numbers of analog arrays per core---affects the runtime of the iterative solvers and how those architectural choices impact the balance of analog and digital work in the full system.
+This analysis shows the potential of using RISC-V processors and analog computing hardware for HPC workloads.
