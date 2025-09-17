@@ -2,7 +2,7 @@
 set -eo pipefail
 
 # ================= Compiler ================= #
-export ROOT="$(realpath "$(pwd)"/..)"
+export ROOT="$(realpath "$(pwd)"/../..)"
 export BUILD_DEST="$ROOT/build"
 COMPILER="$BUILD_DEST/llvm-project/bin/clang++"
 TARGET="riscv64-unknown-linux-musl"
@@ -13,8 +13,8 @@ SYSROOT="$TOOLCHAIN/sysroot"
 RCC="riscv64-unknown-linux-musl-g++"
 RCXX_FLAGS="-static -fopenmp"
 
-CC="$COMPILER --target=$TARGET --gcc-toolchain=$TOOLCHAIN --sysroot=$SYSROOT"
-CXX_FLAGS="-static"
+ACC="$COMPILER --target=$TARGET --gcc-toolchain=$TOOLCHAIN --sysroot=$SYSROOT"
+ACXX_FLAGS="-static"
 
 
 # ================= SST Setup ================ #
@@ -28,10 +28,10 @@ module load openmpi
 export PYTHON_GIL=0
 
 # ================= Params =================== #
-#export GOLEM_ARRAY_TYPE="golem.CrossSimFloatArray"
-export GOLEM_ARRAY_TYPE="golem.MVMFloatArray"
+export GOLEM_ARRAY_TYPE="golem.CrossSimFloatArray"
+#export GOLEM_ARRAY_TYPE="golem.MVMFloatArray"
 
-export VANADIS_NUM_CORES=4
+export VANADIS_NUM_CORES=64
 export GOLEM_NUM_ARRAYS=1
 export VANADIS_EXE=$(pwd)/test.exe
 
@@ -90,7 +90,7 @@ echo "  Size: ${ARRAY_INPUT_SIZE}x${ARRAY_OUTPUT_SIZE}"
 #
 
 
-$CC $CXX_FLAGS -c kernel.cpp -o kernel.o
+$ACC $ACXX_FLAGS -c kernel.cpp -o kernel.o
 $RCC $RCXX_FLAGS \
   -DINPUT_SIZE="$INPUT_SIZE" \
   -DNUM_ARRAYS="$GOLEM_NUM_ARRAYS" \
@@ -101,7 +101,7 @@ $BUILD_DEST/llvm-project/bin/llvm-objdump -d test.exe > test.s
 
 st=$(date +%s%N)
 #$BUILD_DEST/gdb/bin/gdb --args $BUILD_DEST/sst-core/libexec/sstsim.x -n 1 sst-conf.py
-sst -n 1 sst-conf.py 
+sst -n 32 sst-config.py
 end=$(date +%s%N)
 ns=$((end - st))                       # ns
 s=$((ns/1000000000))                   # seconds

@@ -14,7 +14,7 @@ testDir="basic-io"; exe="hello-world"
 physMemSize="4GiB"
 
 tlbType="simpleTLB"; mmuType="simpleMMU"
-backingType="timingDRAM"  # simpleMem | simpleDRAM | timingDRAM
+backingType="simpleDRAM"  # simpleMem | simpleDRAM | timingDRAM
 
 sst.setProgramOption("timebase","1ps")
 sst.setStatisticLoadLevel(7)
@@ -47,7 +47,7 @@ mem_clock=os.getenv("VANADIS_MEM_CLOCK","1.0GHz")
 
 numCpus=int(os.getenv("VANADIS_NUM_CORES",1))
 numThreads=int(os.getenv("VANADIS_NUM_HW_THREADS",1))
-numMemories=int(os.getenv("VANADIS_NUM_MEMORIES",2))
+numMemories=int(os.getenv("VANADIS_NUM_MEMORIES",1))
 
 rocc_type = os.getenv("GOLEM_ROCC_TYPE", "golem.RoCCAnalogFloat")
 array_type = os.getenv("GOLEM_ARRAY_TYPE")
@@ -78,7 +78,7 @@ else:
 
 osl1cacheParams={"access_latency_cycles":"2","cache_frequency":cpu_clock,"replacement_policy":"lru",
                  "coherence_protocol":protocol,"associativity":"8","cache_line_size":"64",
-                 "cache_size":"32 KB","L1":"1","debug":mh_debug,"debug_level":mh_debug_level}
+                 "cache_size":"32 KB","L1":"1","debug":mh_debug,"debug_level":mh_debug_level}#, "cache_type": "noninclusive"}
 
 mmuParams={"debug_level":0,"num_cores":numCpus,"num_threads":numThreads,"page_size":4096}
 memParams={"mem_size":"4GiB","access_time":"1 ns"}
@@ -96,7 +96,7 @@ timingParams={"id":0,"addrMapper":"memHierarchy.roundRobinAddrMapper",
               "channel.rank.printconfig":0,"channel.rank.bank.printconfig":0}
 
 tlbParams={"debug_level":0,"hitLatency":1,"num_hardware_threads":numThreads,
-          "num_tlb_entries_per_thread":512,"tlb_set_size":1}
+          "num_tlb_entries_per_thread":1024,"tlb_set_size":1}
 tlbWrapperParams={"debug_level":0}
 decoderParams={"loader_mode":loader_mode,"uop_cache_entries":1536,"predecode_cache_entries":4}
 osHdlrParams={}
@@ -113,7 +113,7 @@ arrayParams = {
     "clock": cpu_clock,
     "max_instructions": 8,
     "verbose": 8,
-    "mmioAddr": 0,
+    "mmioAddr": 0xFFFF00000000,
     "numArrays": num_arrays,
     "arrayInputSize": array_input_size,
     "arrayOutputSize": array_output_size,
@@ -144,7 +144,8 @@ cpuParams={"clock":cpu_clock,"verbose":verbosity,"hardware_threads":numThreads,
            "start_verbose_when_issue_address":dbgAddr,"stop_verbose_when_retire_address":stopDbg,
            "print_rob":False}
 
-lsqParams={"verbose":verbosity,"address_mask":0xFFFFFFFF,"max_loads":lsq_ld_entries,"max_stores":lsq_st_entries}
+#"address_mask":0xFFFFFFFF,
+lsqParams={"verbose":verbosity, "max_loads":lsq_ld_entries,"max_stores":lsq_st_entries}
 l1dcacheParams={"access_latency_cycles":"2","cache_frequency":cpu_clock,"replacement_policy":"lru",
                 "coherence_protocol":protocol,"associativity":"8","cache_line_size":"64",
                 "cache_size":"32 KB","L1":"1","debug":mh_debug,"debug_level":mh_debug_level}
@@ -158,9 +159,35 @@ l2cacheParams={"access_latency_cycles":"14","cache_frequency":cpu_clock,"replace
 l2_prefetch_params={"reach":16,"detect_range":1}
 busParams={"bus_frequency":cpu_clock}
 
+l2cacheParams.update({
+    "mshr_num_entries": 64,
+    "request_link_buffer_entries": 256,
+    "response_link_buffer_entries": 256,
+})
+
 # NIC params for Merlin
-nicVN1={"group":1,"network_bw":"50GB/s"}  # CPUs + OS
-nicVN2={"group":2,"network_bw":"50GB/s"}  # Directory
+nicVN1={"group":1,"network_bw":"100GB/s"}  # CPUs + OS
+nicVN2={"group":2,"network_bw":"100GB/s"}  # Directory
+#nicVN1={"group":0,"network_bw":"50GB/s"}  # CPUs + OS
+#nicVN2={"group":0,"network_bw":"50GB/s"}  # Directory
+
+#
+#l1dcacheParams["mshr_num_entries"] = -1
+#l1icacheParams["mshr_num_entries"] = -1
+#l2cacheParams["mshr_num_entries"] = -1
+#osl1cacheParams["mshr_num_entries"] = -1
+#
+#l1dcacheParams["max_requests_per_cycle"] = -1
+#l1icacheParams["max_requests_per_cycle"] = -1
+#l2cacheParams["max_requests_per_cycle"] = -1
+#osl1cacheParams["max_requests_per_cycle"] = -1
+#
+#
+#l1dcacheParams["llsc_block_cycles"] = 10
+#l1icacheParams["llsc_block_cycles"] = 10
+#l2cacheParams["llsc_block_cycles"] = 10
+#osl1cacheParams["llsc_block_cycles"] = 10
+#
 
 # --------- OS + MMU + OS-L1 ---------
 node_os = sst.Component("os","vanadis.VanadisNodeOS"); node_os.addParams(osParams)
@@ -288,6 +315,92 @@ class CPU_Builder:
 #        sst.Link(prefix+".bus_l2").connect((bus,"lowlink0","1ns"), (l2,"highlink","1ns"))
 #        return (cpu, "os_link", "5ns"), (dtlb, "mmu", "1ns"), (itlb, "mmu", "1ns"), (nic, "port", "1ns")
 #
+#
+class CPU_Builder:
+    def build(self, prefix, nodeId, cid):
+        # CPU
+        cpu = sst.Component(prefix, vanadis_cpu_type)
+        cpu.addParams(cpuParams)
+        cpu.addParam("core_id", cid)
+        cpu.enableAllStatistics()
+
+        # Decoders (+ OS handler + branch unit)
+        for n in range(numThreads):
+            dec = cpu.setSubComponent("decoder"+str(n), vanadis_decoder)
+            dec.addParams(decoderParams); dec.enableAllStatistics()
+            osh = dec.setSubComponent("os_handler", vanadis_os_hdlr)
+            osh.addParams(osHdlrParams)
+            br  = dec.setSubComponent("branch_unit", "vanadis.VanadisBasicBranchUnit")
+            br.addParams(branchPredParams); br.enableAllStatistics()
+
+        # LSQ + mem IFs
+        lsq  = cpu.setSubComponent("lsq", "vanadis.VanadisBasicLoadStoreQueue")
+        lsq.addParams(lsqParams); lsq.enableAllStatistics()
+        d_if = lsq.setSubComponent("memory_interface", "memHierarchy.standardInterface")
+        i_if = cpu.setSubComponent("mem_interface_inst", "memHierarchy.standardInterface")
+
+        # RoCC + Array
+        cpu_rocc = cpu.setSubComponent("rocc", rocc_type, 0)
+        cpu_rocc.addParams(roccParams); cpu_rocc.enableAllStatistics()
+        roccD_if = cpu_rocc.setSubComponent("memory_interface", "memHierarchy.standardInterface")
+        arr = cpu_rocc.setSubComponent("array", array_type)
+        arr.addParams(arrayParams)
+
+        # Caches + MemLinks
+        l1d = sst.Component(prefix+".l1d", "memHierarchy.Cache")
+        l1d.addParams(l1dcacheParams)
+        l1d_high = l1d.setSubComponent("highlink", "memHierarchy.MemLink")
+        l1d_low  = l1d.setSubComponent("lowlink",  "memHierarchy.MemLink")
+
+        l1i = sst.Component(prefix+".l1i", "memHierarchy.Cache")
+        l1i.addParams(l1icacheParams)
+        l1i_high = l1i.setSubComponent("highlink", "memHierarchy.MemLink")
+        l1i_low  = l1i.setSubComponent("lowlink",  "memHierarchy.MemLink")
+
+        l2  = sst.Component(prefix+".l2", "memHierarchy.Cache")
+        l2.addParams(l2cacheParams)
+        l2_high = l2.setSubComponent("highlink", "memHierarchy.MemLink")
+        l2_low  = l2.setSubComponent("lowlink",  "memHierarchy.MemNIC")
+        l2_low.addParams(nicVN1)
+        l2pre = l2.setSubComponent("prefetcher", "cassini.StridePrefetcher")
+        l2pre.addParams(l2_prefetch_params)
+
+        # Buses
+        dbus    = sst.Component(prefix+".dbus",    "memHierarchy.Bus"); dbus.addParams(busParams)
+        corebus = sst.Component(prefix+".corebus", "memHierarchy.Bus"); corebus.addParams(busParams)
+
+        # TLBs (no MemLinks — use fixed ports)
+        dtlbW = sst.Component(prefix+".dtlb", "mmu.tlb_wrapper")
+        dtlbW.addParams(tlbWrapperParams)
+        dtlb  = dtlbW.setSubComponent("tlb", "mmu."+tlbType)
+        dtlb.addParams(tlbParams)
+
+        itlbW = sst.Component(prefix+".itlb", "mmu.tlb_wrapper")
+        itlbW.addParams(tlbWrapperParams)
+        itlbW.addParam("exe", True)
+        itlb  = itlbW.setSubComponent("tlb", "mmu."+tlbType)
+        itlb.addParams(tlbParams)
+
+        # ---- Wiring ----
+        # D-side: LSQ + RoCC → dbus → DTLB → L1D
+        sst.Link(prefix+".lsq_dbus").connect( (d_if,     "lowlink","1ns"), (dbus,    "highlink0","1ns") )
+        sst.Link(prefix+".rocc_dbus").connect((roccD_if, "lowlink","1ns"), (dbus,    "highlink1","1ns") )
+        sst.Link(prefix+".dbus_dtlb").connect((dbus,     "lowlink0","1ns"), (dtlbW,  "cpu_if","1ns") )
+        sst.Link(prefix+".dtlb_l1d").connect((dtlbW,     "cache_if","1ns"), (l1d_high, "port","1ns") )
+
+        # I-side: I IF → ITLB → L1I
+        sst.Link(prefix+".i_tlb").connect   ( (i_if,     "lowlink","1ns"), (itlbW, "cpu_if","1ns") )
+        sst.Link(prefix+".itlb_l1i").connect((itlbW,     "cache_if","1ns"), (l1i_high,"port","1ns") )
+
+        # L1s → corebus → L2
+        sst.Link(prefix+".l1d_bus").connect((l1d_low,"port","1ns"), (corebus,"highlink0","1ns"))
+        sst.Link(prefix+".l1i_bus").connect((l1i_low,"port","1ns"), (corebus,"highlink1","1ns"))
+        sst.Link(prefix+".bus_l2").connect ((corebus,"lowlink0","1ns"), (l2_high,"port","1ns"))
+
+        # Return endpoints for external wiring
+        return (cpu, "os_link", "5ns"), (dtlb, "mmu", "1ns"), (itlb, "mmu", "1ns"), (l2_low, "port", "1ns")
+
+
 cpuBuilder = CPU_Builder()
 
 # --------- Memory + Directory (Dir on Merlin, Mem behind Dir) ---------
@@ -306,7 +419,7 @@ def build_mem_dir(idx):
     dirctrl = sst.Component(f"dir{idx}","memHierarchy.DirectoryController")
     dirctrl.addParams({"coherence_protocol":protocol,"entry_cache_size":32768,
         "debug":mh_debug,"debug_level":mh_debug_level, "interleave_size": "64B", "interleave_step": f"{numMemories*64}B",
-        "addr_range_start": idx*64, "addr_range_end": (1<<30) - ((numMemories-idx)*64)+63})
+        "addr_range_start": idx*64, "addr_range_end": (1<<32) - ((numMemories-idx)*64)+63})
     dir_to_mem = dirctrl.setSubComponent("lowlink","memHierarchy.MemLink")
     mem_to_dir = memctrl.setSubComponent("highlink","memHierarchy.MemLink")
     sst.Link(f"dir_mem_{idx}").connect((dir_to_mem,"port","1ns"), (mem_to_dir,"port","1ns"))
@@ -321,11 +434,27 @@ total_ports = local_ports + neighbor_ports
 local_base = neighbor_ports
 
 rtr = sst.Component("chiprtr","merlin.hr_router")
+#rtr.addParams({
+#    "id":"0",
+#    "xbar_bw":"200GB/s",
+#    "link_bw":"200GB/s",
+#    "flit_size":"256B",
+#    "input_buf_size":"2KB",
+#    "output_buf_size":"2KB",
+#    "num_vns":3,
+#    "num_ports": str(total_ports),
+#})
 rtr.addParams({
-    "id":"0","xbar_bw":"100GB/s","link_bw":"100GB/s","flit_size":"256B",
-    "input_buf_size":"2KB","output_buf_size":"2KB","num_vns":3,
+    "id":"0",
+    "xbar_bw":"8GB/s",
+    "link_bw":"8GB/s",
+    "flit_size":"8B",
+    "input_buf_size":"14KB",
+    "output_buf_size":"14KB",
+    "num_vns":3,
     "num_ports": str(total_ports),
 })
+
 topo = rtr.setSubComponent("topology","merlin.mesh")
 topo.addParams({"shape":"1x1","width":"1x1","local_ports":local_ports,"link_latency":"1ns"})
 
